@@ -1,3 +1,3 @@
-# CarRentalSystem
+# Car Rental System
 
 NUS IS2103 Pair Project AY19-20 Semester 1
