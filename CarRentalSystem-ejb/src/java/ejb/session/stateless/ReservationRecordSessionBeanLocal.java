@@ -11,7 +11,6 @@ import javax.ejb.Local;
  *
  * @author Trishpal
  */
-@Local
 public interface ReservationRecordSessionBeanLocal {
     
     public String retrieveReservationDetails(Long resId, Long customerId) throws RentalRecordNotFoundException, EntityMismatchException;
