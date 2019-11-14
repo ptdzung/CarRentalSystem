@@ -17,7 +17,6 @@ import util.exception.CarNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.LicensePlateExistException;
 import util.exception.UnknownPersistenceException;
-import util.exception.UpdateCarException;
 
 /**
  *
@@ -37,7 +36,7 @@ public interface CarSessionBeanRemote {
 
     CarEntity retrieveCarById(Long carId) throws CarNotFoundException;
 
-    void updateCar(CarEntity car) throws CarNotFoundException, UpdateCarException, InputDataValidationException;
+    void updateCar(CarEntity car) throws CarNotFoundException, InputDataValidationException;
 
     boolean deleteCar(Long carId) throws CarNotFoundException;
 
@@ -48,6 +47,14 @@ public interface CarSessionBeanRemote {
     CarEntity retrieveCarByCarModel(String make, String modelName) throws CarNotFoundException, CarModelNotFoundException;
 
     CarCategoryEntity retrieveCarCategoryByName(String categoryName) throws CarCategoryNotFoundException;
+
+    CarModelEntity retrieveCarModelById(Long carModelId) throws CarModelNotFoundException;
+
+    CarModelEntity retrieveCarModel(String make, String modelName) throws CarModelNotFoundException;
+
+    OutletEntity retrieveOutletById(Long outletId);
+
+    CarEntity retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException;
     
     
 }
