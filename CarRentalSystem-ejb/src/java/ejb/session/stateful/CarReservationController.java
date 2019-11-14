@@ -8,6 +8,8 @@ package ejb.session.stateful;
 import ejb.session.stateless.CustomerSessionBeanLocal;
 import ejb.session.stateless.ReservationRecordSessionBeanLocal;
 import entity.OwnCustomerEntity;
+import entity.RentalRecordEntity;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -15,6 +17,8 @@ import javax.ejb.Stateful;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.RentalRecordNotFoundException;
+import util.exception.EntityMismatchException;
 
 /**
  *
@@ -27,8 +31,7 @@ public class CarReservationController implements CarReservationControllerRemote,
 
     @EJB
     private CustomerSessionBeanLocal customerSessionBean;
-    
-    
+       
     @EJB
     private ReservationRecordSessionBeanLocal reservationRecordSessionBean;
 
@@ -48,12 +51,27 @@ public class CarReservationController implements CarReservationControllerRemote,
     
     @Override
     public void customerLogout() {
-        customer =null;
+        customer = null;
     }
     
     public void setCustomerEmail(String email) {
         this.email = email;
     }
     
+    @Override
+    public List<RentalRecordEntity> retrieveAllReservation() throws RentalRecordNotFoundException, EntityMismatchException {
+        System.err.println("customer id: " + customer.getCustomerId());
+        return customer.getRentalRecords();
+    }
+    
+    @Override
+    public String retrieveReservationDetails(Long resId) throws RentalRecordNotFoundException, EntityMismatchException {
+        return reservationRecordSessionBean.retrieveReservationDetails(resId, customer.getCustomerId());
+    }
+    
+    @Override
+    public String cancelReservation(Long resId) throws RentalRecordNotFoundException {
+        return reservationRecordSessionBean.cancelReservation(resId);
+    }
     
 }
