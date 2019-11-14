@@ -6,13 +6,13 @@
 package ejb.session.stateless;
 
 import entity.RentalRecordEntity;
+import java.math.BigDecimal;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import util.exception.CancelReservationException;
 import util.exception.EntityMismatchException;
 import util.exception.RentalRecordNotFoundException;
 
@@ -37,18 +37,49 @@ public class ReservationRecordSessionBean implements ReservationRecordSessionBea
     
     @Override
     public String cancelReservation(long resId) throws RentalRecordNotFoundException {
-        RentalRecordEntity reservationToCancel. = retrieveReservationById(resId);
-        
+        String message;
+        RentalRecordEntity reservationToCancel = retrieveReservationById(resId);
+        reservationToCancel.setCancelled(true);
+        long difference = reservationToCancel.getRentedFrom().getTime() - reservationToCancel.getCancelledDate().getTime();
+        int daysBetween = (int) (difference / (1000*60*60*24));
         if (reservationToCancel.isHasPaid()) {
-            if (reservationToCancel.getRentedFrom())
-            reservationToCancel.setCancelled(true);
-            
+            if (daysBetween >= 14) {
+                reservationToCancel.setTotalAmount(new BigDecimal(0));
+                message = "You have been refunded the full balance of your reservation";           
+            }
+            else if ( 14 > daysBetween &&  daysBetween > 6) {
+                reservationToCancel.setTotalAmount(reservationToCancel.getTotalAmount().multiply(new BigDecimal(0.2)));
+                message = "You have been refunded 80% of the total amount";
+            }
+            else if ( 7 > daysBetween &&  daysBetween > 3) {
+                reservationToCancel.setTotalAmount(reservationToCancel.getTotalAmount().multiply(new BigDecimal(0.5)));
+                message = "You have been refunded  50% of the total amount";
+            }
+            else {
+                reservationToCancel.setTotalAmount(reservationToCancel.getTotalAmount().multiply(new BigDecimal(0.7)));
+                message = "You have been refunded 30% of the total amount";
+            }             
         }
         else {
-            
-            reservationToCancel.setCancelled(true);
+            reservationToCancel.setHasPaid(true);
+            if (daysBetween >= 14) {
+                reservationToCancel.setTotalAmount(new BigDecimal(0));
+                message = "You have been not been charged the full balance of your reservation";          
+            }
+            else if ( 14 > daysBetween &&  daysBetween > 6) {
+                reservationToCancel.setTotalAmount(reservationToCancel.getTotalAmount().multiply(new BigDecimal(0.2)));
+                message = "You have been charged for 80% of the total amount";
+            }
+            else if ( 7 > daysBetween &&  daysBetween > 3) {
+                reservationToCancel.setTotalAmount(reservationToCancel.getTotalAmount().multiply(new BigDecimal(0.5)));
+                message = "You have been charged  for 50% of the total amount";
+            }
+            else {
+                reservationToCancel.setTotalAmount(reservationToCancel.getTotalAmount().multiply(new BigDecimal(0.7)));
+                message = "You have been charged for 30% of the total amount";
+            }  
         }
-            
+            return message;
       }
         
      
