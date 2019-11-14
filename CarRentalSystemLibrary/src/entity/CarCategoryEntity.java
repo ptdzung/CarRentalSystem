@@ -102,4 +102,8 @@ public class CarCategoryEntity implements Serializable {
         carModels.remove(carModel);
     }
     
+    public void removeRentalRate(RentalRateEntity rate) {
+        rentalRates.remove(rate);
+    }
+    
 }

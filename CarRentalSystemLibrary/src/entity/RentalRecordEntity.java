@@ -56,14 +56,18 @@ public class RentalRecordEntity implements Serializable {
         
     @Column(nullable = false, length = 16)
     @NotNull
-    @Size(min = 16, max = 16)
-    private String creditCard;
+    @Size(max = 16)
+    private String creditCardNumber;
     
     @Column(nullable = false, precision = 11, scale = 2)
     @NotNull
     @DecimalMin("0.00")
     @Digits(integer = 9, fraction = 2)
     private BigDecimal totalAmount;
+    
+    @Column(nullable = false)
+    @NotNull
+    private boolean hasPaid;
     
     @Column(nullable = false)
     @NotNull
@@ -108,6 +112,7 @@ public class RentalRecordEntity implements Serializable {
         Calendar calendar = Calendar.getInstance();
         this.rentedOn = calendar.getTime();
         this.cancelled = false;
+        this.hasPaid = false;
         
         rentalDays = new ArrayList<>();
     }
@@ -119,7 +124,7 @@ public class RentalRecordEntity implements Serializable {
         
         this.rentedFrom = rentedFrom;
         this.rentedTo = rentedTo;
-        this.creditCard = creditCard;
+        this.creditCardNumber = creditCard;
         this.customer = customer;
         this.car = car;
         this.carModel = carModel;
@@ -133,7 +138,7 @@ public class RentalRecordEntity implements Serializable {
         
         this.rentedFrom = rentedFrom;
         this.rentedTo = rentedTo;
-        this.creditCard = creditCard;
+        this.creditCardNumber = creditCard;
         this.partner = partner;
         this.customer = customer;
         this.car = car;
@@ -262,12 +267,12 @@ public class RentalRecordEntity implements Serializable {
         this.rentalDays = rentalDays;
     }
 
-    public String getCreditCard() {
-        return creditCard;
+    public String getCreditCardNumber() {
+        return creditCardNumber;
     }
 
-    public void setCreditCard(String creditCard) {
-        this.creditCard = creditCard;
+    public void setCreditCardNumber(String creditCardNumber) {
+        this.creditCardNumber = creditCardNumber;
     }
 
     public BigDecimal getTotalAmount() {
@@ -276,6 +281,14 @@ public class RentalRecordEntity implements Serializable {
 
     public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public boolean isHasPaid() {
+        return hasPaid;
+    }
+
+    public void setHasPaid(boolean hasPaid) {
+        this.hasPaid = hasPaid;
     }
 
     
