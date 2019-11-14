@@ -5,13 +5,17 @@
  */
 package ejb.session.stateless;
 
-import javax.ejb.Remote;
+import util.exception.EntityMismatchException;
+import util.exception.RentalRecordNotFoundException;
 
 /**
  *
  * @author Trishpal
  */
-@Remote
+
 public interface ReservationRecordSessionBeanRemote {
-    
+
+    public String retrieveReservationDetails(Long resId, Long customerId) throws RentalRecordNotFoundException, EntityMismatchException;
+
+    public String cancelReservation(long resId) throws RentalRecordNotFoundException;
 }
