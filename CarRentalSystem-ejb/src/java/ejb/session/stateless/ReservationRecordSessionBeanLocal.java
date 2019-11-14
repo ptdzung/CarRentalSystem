@@ -14,4 +14,7 @@ import javax.ejb.Local;
 @Local
 public interface ReservationRecordSessionBeanLocal {
     
+    public String retrieveReservationDetails(Long resId, Long customerId) throws RentalRecordNotFoundException, EntityMismatchException;
+
+    public String cancelReservation(long resId) throws RentalRecordNotFoundException;
 }
