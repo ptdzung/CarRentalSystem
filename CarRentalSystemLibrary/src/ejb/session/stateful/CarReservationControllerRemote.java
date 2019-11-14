@@ -5,18 +5,26 @@
  */
 package ejb.session.stateful;
 
-import javax.ejb.Remote;
+import entity.RentalRecordEntity;
+import java.util.List;
+import util.exception.EntityMismatchException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.RentalRecordNotFoundException;
 
 /**
  *
  * @author Trishpal
  */
-@Remote
 public interface CarReservationControllerRemote {
 
     public void customerLogout();
 
     public void customerLogin(String username, String password) throws InvalidLoginCredentialException;
+
+    public List<RentalRecordEntity> retrieveAllReservation() throws RentalRecordNotFoundException, EntityMismatchException;
+
+    public String retrieveReservationDetails(Long resId) throws RentalRecordNotFoundException, EntityMismatchException;
+
+    public String cancelReservation(Long resId) throws RentalRecordNotFoundException;
     
 }
