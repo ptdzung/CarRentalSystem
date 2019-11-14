@@ -31,7 +31,6 @@ import util.exception.CarModelNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.LicensePlateExistException;
 import util.exception.UnknownPersistenceException;
-import util.exception.UpdateCarException;
 
 /**
  *
@@ -158,7 +157,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     
 
     @Override
-    public void updateCar(CarEntity car) throws CarNotFoundException, UpdateCarException, InputDataValidationException {
+    public void updateCar(CarEntity car) throws CarNotFoundException, InputDataValidationException {
         if(car != null && car.getCarId()!= null)
         {
             Set<ConstraintViolation<CarEntity>>constraintViolations = validator.validate(car);
@@ -167,17 +166,10 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             {
                 CarEntity carToUpdate = retrieveCarById(car.getCarId());
 
-                if(carToUpdate.getLicensePlate().equals(car.getLicensePlate()))
-                {
-                    carToUpdate.setStatus(car.getStatus());
-                    carToUpdate.setOutlet(car.getOutlet());
-                    carToUpdate.setRentedTo(car.getRentedTo());
-                    carToUpdate.setRentalRecord(car.getRentalRecord());
-                }
-                else
-                {
-                    throw new UpdateCarException("License plate of car record to be updated does not match the existing record");
-                }
+                carToUpdate.setStatus(car.getStatus());
+                carToUpdate.setOutlet(car.getOutlet());
+                carToUpdate.setRentedTo(car.getRentedTo());
+                carToUpdate.setRentalRecord(car.getRentalRecord());
             }
             else
             {
@@ -268,21 +260,18 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     @Override
     public CarEntity retrieveCarByCarModel(String make, String modelName) throws CarNotFoundException, CarModelNotFoundException {
-        Query query = em.createQuery("SELECT cm FROM CarModelEntity cm WHERE cm.make = :inMake AND cm.modelName = :inModelName");
-        query.setParameter("inMake", make);
-        query.setParameter("inModelName", modelName);
-        CarModelEntity carModel = (CarModelEntity)query.getSingleResult();
+        CarModelEntity carModel = retrieveCarModel(make, modelName);
         if (carModel != null) {
-            query = em.createQuery("SELECT c FROM CarEntity c WHERE c.carModel = :inModel");
+            Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.carModel = :inModel");
             query.setParameter("inModel", carModel);
             CarEntity car = (CarEntity)query.getSingleResult();
             if (car != null) {
                 return car;
             } else {
-                throw new CarNotFoundException("This car does not exist!");
+                throw new CarNotFoundException("This does not exist!");
             }
         } else {
-            throw new CarModelNotFoundException("This car model does not exist!");
+            throw new CarModelNotFoundException("Car model " + make + " " + modelName + " does not exist!");
         }
     }
 
@@ -296,6 +285,49 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             return carCategory;
         } catch(NoResultException | NonUniqueResultException ex) {
             throw new CarCategoryNotFoundException("Car category " + categoryName + " does not exist!");
+        }
+    }
+
+    @Override
+    public CarModelEntity retrieveCarModelById(Long carModelId) throws CarModelNotFoundException {
+        CarModelEntity cm = em.find(CarModelEntity.class, carModelId);
+        
+        if(cm != null) {
+            return cm;
+        } else {
+            throw new CarModelNotFoundException("Car Model ID " + carModelId + " does not exist!");
+        } 
+    }
+
+    @Override
+    public CarModelEntity retrieveCarModel(String make, String modelName) throws CarModelNotFoundException {
+        Query query = em.createQuery("SELECT cm FROM CarModelEntity cm WHERE cm.make = :inMake AND cm.modelName = :inModelName");
+        query.setParameter("inMake", make);
+        query.setParameter("inModelName", modelName);
+        CarModelEntity carModel = (CarModelEntity)query.getSingleResult();
+        
+        if(carModel != null) {
+            return carModel;
+        } else {
+            throw new CarModelNotFoundException("Car model " + make + " " + modelName + " does not exist!");
+        }
+    }
+
+    @Override
+    public OutletEntity retrieveOutletById(Long outletId) {
+        return em.find(OutletEntity.class, outletId);
+    }
+
+    @Override
+    public CarEntity retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException {
+        Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.licensePlate = :inPlate");
+        query.setParameter("inPlate", licensePlate);
+        CarEntity car = (CarEntity)query.getSingleResult();
+        
+        if(car != null) {
+            return car;
+        } else {
+            throw new CarNotFoundException("Car license plate " + licensePlate + " does not exist!");
         }
     }
     
