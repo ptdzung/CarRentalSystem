@@ -38,7 +38,7 @@ public class OwnCustomerEntity extends CustomerEntity implements Serializable {
     public OwnCustomerEntity() {
     }    
 
-    public OwnCustomerEntity(String username, String password, String name, String email, PartnerEntity partner) {
+    public OwnCustomerEntity(String name, String username, String password, String email, PartnerEntity partner) {
         super(name, email, partner);
         
         this.username = username;

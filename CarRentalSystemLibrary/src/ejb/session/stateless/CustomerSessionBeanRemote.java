@@ -5,18 +5,25 @@
  */
 package ejb.session.stateless;
 
+import entity.CustomerEntity;
 import entity.OwnCustomerEntity;
+import javax.ejb.Remote;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialException;
-
+import util.exception.UnknownPersistenceException;
+import util.exception.UsernameExistException;
+import util.exception.CustomerNotFoundException;
 
 /**
  *
- * @author Trishpal
+ * @author Pham The Dzung
  */
-
+@Remote
 public interface CustomerSessionBeanRemote {
-    
-    public void registerNewCustomer(String name, String username, String password, String emailAddress);
+    public Long registerNewCustomer(String name, String username, String password, String emailAddress) throws UsernameExistException, InputDataValidationException, UnknownPersistenceException;
 
     public OwnCustomerEntity customerLogin(String username, String password) throws InvalidLoginCredentialException;
+
+    CustomerEntity retrieveCustomerByEmail(String email) throws CustomerNotFoundException;
+    
 }
