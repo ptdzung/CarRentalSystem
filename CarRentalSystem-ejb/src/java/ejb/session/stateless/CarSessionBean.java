@@ -131,14 +131,14 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     @Override
     public List<CarEntity> retrieveAllCars() {
-        Query query = em.createQuery("SELECT c FROM CarEntity c");
+        Query query = em.createQuery("SELECT c FROM CarEntity c ORDER BY c.carModel.carCategory ASC");
         
         return query.getResultList();
     }
 
     @Override
     public List<CarModelEntity> retrieveAllCarModels() {
-        Query query = em.createQuery("SELECT cm FROM CarModelEntity cm");
+        Query query = em.createQuery("SELECT cm FROM CarModelEntity cm ORDER BY cm.carCategory ASC");
         
         return query.getResultList();
     }
@@ -319,15 +319,19 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public CarEntity retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException {
-        Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.licensePlate = :inPlate");
-        query.setParameter("inPlate", licensePlate);
-        CarEntity car = (CarEntity)query.getSingleResult();
-        
-        if(car != null) {
-            return car;
+    public CarEntity retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException, InputDataValidationException {
+        if (licensePlate.length() != 8) {
+            Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.licensePlate = :inPlate");
+            query.setParameter("inPlate", licensePlate);
+            CarEntity car = (CarEntity)query.getSingleResult();
+
+            if(car != null) {
+                return car;
+            } else {
+                throw new CarNotFoundException("Car license plate " + licensePlate + " does not exist!");
+            }
         } else {
-            throw new CarNotFoundException("Car license plate " + licensePlate + " does not exist!");
+            throw new InputDataValidationException("License plate input is invalid!");
         }
     }
     

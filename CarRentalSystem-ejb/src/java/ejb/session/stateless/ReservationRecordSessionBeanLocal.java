@@ -5,7 +5,12 @@
  */
 package ejb.session.stateless;
 
-import javax.ejb.Local;
+import entity.CustomerEntity;
+import entity.RentalRecordEntity;
+import util.exception.EntityMismatchException;
+import util.exception.RentalRecordNotFoundException;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -16,4 +21,10 @@ public interface ReservationRecordSessionBeanLocal {
     public String retrieveReservationDetails(Long resId, Long customerId) throws RentalRecordNotFoundException, EntityMismatchException;
 
     public String cancelReservation(long resId) throws RentalRecordNotFoundException;
+    
+    public RentalRecordEntity retrieveReservationById(Long resId) throws RentalRecordNotFoundException;
+
+    public List<RentalRecordEntity> retrieveRentalRecordByDate(Date date);
+
+    List<RentalRecordEntity> retrieveRentalRecordsByCustomer(CustomerEntity cus);
 }

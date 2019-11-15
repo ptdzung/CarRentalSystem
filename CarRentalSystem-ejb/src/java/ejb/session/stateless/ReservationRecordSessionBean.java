@@ -5,14 +5,19 @@
  */
 package ejb.session.stateless;
 
+import entity.CustomerEntity;
 import entity.RentalRecordEntity;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import java.util.Date;
+import java.util.List;
 import util.exception.EntityMismatchException;
 import util.exception.RentalRecordNotFoundException;
 
@@ -40,6 +45,7 @@ public class ReservationRecordSessionBean implements ReservationRecordSessionBea
         String message;
         RentalRecordEntity reservationToCancel = retrieveReservationById(resId);
         reservationToCancel.setCancelled(true);
+        
         long difference = reservationToCancel.getRentedFrom().getTime() - reservationToCancel.getCancelledDate().getTime();
         int daysBetween = (int) (difference / (1000*60*60*24));
         if (reservationToCancel.isHasPaid()) {
@@ -47,13 +53,13 @@ public class ReservationRecordSessionBean implements ReservationRecordSessionBea
                 reservationToCancel.setTotalAmount(new BigDecimal(0));
                 message = "You have been refunded the full balance of your reservation";           
             }
-            else if ( 14 > daysBetween &&  daysBetween > 6) {
+            else if ( 14 > daysBetween &&  daysBetween >= 7) {
                 reservationToCancel.setTotalAmount(reservationToCancel.getTotalAmount().multiply(new BigDecimal(0.2)));
                 message = "You have been refunded 80% of the total amount";
             }
-            else if ( 7 > daysBetween &&  daysBetween > 3) {
+            else if ( 7 > daysBetween &&  daysBetween >= 3) {
                 reservationToCancel.setTotalAmount(reservationToCancel.getTotalAmount().multiply(new BigDecimal(0.5)));
-                message = "You have been refunded  50% of the total amount";
+                message = "You have been refunded 50% of the total amount";
             }
             else {
                 reservationToCancel.setTotalAmount(reservationToCancel.getTotalAmount().multiply(new BigDecimal(0.7)));
@@ -64,26 +70,26 @@ public class ReservationRecordSessionBean implements ReservationRecordSessionBea
             reservationToCancel.setHasPaid(true);
             if (daysBetween >= 14) {
                 reservationToCancel.setTotalAmount(new BigDecimal(0));
-                message = "You have been not been charged the full balance of your reservation";          
+                message = "You have not been charged the full balance of your reservation";          
             }
-            else if ( 14 > daysBetween &&  daysBetween > 6) {
+            else if ( 14 > daysBetween &&  daysBetween >= 7) {
                 reservationToCancel.setTotalAmount(reservationToCancel.getTotalAmount().multiply(new BigDecimal(0.2)));
-                message = "You have been charged for 80% of the total amount";
+                message = "You have been charged for 20% of the total amount";
             }
-            else if ( 7 > daysBetween &&  daysBetween > 3) {
+            else if ( 7 > daysBetween &&  daysBetween >= 3) {
                 reservationToCancel.setTotalAmount(reservationToCancel.getTotalAmount().multiply(new BigDecimal(0.5)));
                 message = "You have been charged  for 50% of the total amount";
             }
             else {
                 reservationToCancel.setTotalAmount(reservationToCancel.getTotalAmount().multiply(new BigDecimal(0.7)));
-                message = "You have been charged for 30% of the total amount";
+                message = "You have been charged for 70% of the total amount";
             }  
         }
-            return message;
-      }
+        return message;
+    }
         
      
-   
+    @Override
     public RentalRecordEntity retrieveReservationById(Long resId) throws RentalRecordNotFoundException {
         RentalRecordEntity res =  em.find(RentalRecordEntity.class, resId);
         if (res != null) {
@@ -113,5 +119,34 @@ public class ReservationRecordSessionBean implements ReservationRecordSessionBea
             return details;
         }
     }
+
+    @Override
+    public List<RentalRecordEntity> retrieveRentalRecordByDate(Date date) {
+        Query query = em.createQuery("SELECT rr FROM RentalRecordEntity rr");
+        List<RentalRecordEntity> list = query.getResultList();
+        List<RentalRecordEntity> returnList = new ArrayList<>();
+        for (RentalRecordEntity r : list) {
+            Date temp = r.getRentedFrom();
+            if(date.getYear() == temp.getYear()) {
+                if(date.getMonth() == temp.getMonth()) {
+                    if(date.getDay() == temp.getDay()) {
+                        returnList.add(r);
+                    }
+                }
+            }
+        }
+        
+        return list;
+    }
+
+    @Override
+    public List<RentalRecordEntity> retrieveRentalRecordsByCustomer(CustomerEntity cus) {
+        Query query = em.createQuery("SELECT rr FROM RentalRecordEntity rr WHERE rr.customer = :inCustomer");
+        query.setParameter("inCustomer", cus);
+        
+        return query.getResultList();
+    }
+    
+    
 
 }

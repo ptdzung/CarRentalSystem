@@ -7,12 +7,16 @@ package carrsreservationclient;
 
 import ejb.session.stateful.CarReservationControllerRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
+import entity.OwnCustomerEntity;
 import entity.RentalRecordEntity;
 import java.util.List;
 import java.util.Scanner;
 import util.exception.EntityMismatchException;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.RentalRecordNotFoundException;
+import util.exception.UnknownPersistenceException;
+import util.exception.UsernameExistException;
 
 /**
  *
@@ -23,8 +27,7 @@ public class MainApp {
     private CustomerSessionBeanRemote customerSessionBeanRemote;
     private CarReservationControllerRemote carReservationControllerRemote;
     
-    private boolean loggedIn;
-    private Scanner sc = new Scanner(System.in);
+    private OwnCustomerEntity currentCustomer;
 
     public MainApp() {
     }
@@ -35,13 +38,14 @@ public class MainApp {
     }
     
     public void runApp(){
+        Scanner sc = new Scanner(System.in);
         
         while(true){
-            System.out.println("****Welcome to the Car Reservation client****");
-            System.out.println("(1) Register as Customer");
+            System.out.println("*** Welcome to the Merlion Car Reservation System ***\n");
+            System.out.println("(1) Register New Customer");
             System.out.println("(2) Customer Login");
-            System.out.println("(3) Search car");
-            System.out.println("(4) Exit");
+            System.out.println("(3) Search Car");
+            System.out.println("(4) Exit\n");
             
             System.out.print("> ");
             String response = sc.next();
@@ -52,63 +56,80 @@ public class MainApp {
                     registerCustomer();
                     break;
                 case "2":
-                    customerLogin();
+                    try {
+                        customerLogin();
+                    } catch (InvalidLoginCredentialException ex) {
+                        ex.getMessage();
+                    }
                     break;
                 case "3":
                     searchCar();
                     break;
                 case "4":
-                    System.out.println("\n****Exiting system****");
+                    System.out.println("\n*** Exiting System ***");
                     System.exit(0);
                     break;
                 default:
-                    System.err.println("Invalid command");
+                    System.err.println("Invalid command. Please try again!");
             }
         }   
     }
     
     private void registerCustomer(){
-        System.out.println("****Register New Customer****");
-        System.out.print("Enter name> ");
-        sc.nextLine();
-        String name = sc.nextLine();
-        System.out.print("Enter username> ");
-        String username = sc.next();
-        System.out.print("Enter password> ");
-        String password = sc.next();
-        System.out.print("Enter email address> ");
-        String email = sc.next();
+        Scanner sc = new Scanner(System.in);
         
-        customerSessionBeanRemote.registerNewCustomer(name, username, password, email);
-        System.out.println("\n***New Customer Created!*\n");
+        System.out.println("*** Reservation System :: Register New Customer ***\n");
+        System.out.print("Enter name> ");
+        String name = sc.nextLine().trim();
+        System.out.print("Enter username> ");
+        String username = sc.nextLine().trim();
+        System.out.print("Enter password> ");
+        String password = sc.nextLine().trim();
+        System.out.print("Enter email address> ");
+        String email = sc.nextLine().trim();
+        
+        try {
+            Long cusId = customerSessionBeanRemote.registerNewCustomer(name, username, password, email);
+            System.out.println("New customer created successfully. Customer ID: " + cusId);
+        } catch (UsernameExistException | InputDataValidationException | UnknownPersistenceException ex) {
+            ex.getMessage();
+        }
     }
     
-    private void customerLogin(){
-        System.out.println("\n****Customer Login****");
+    private void customerLogin() throws InvalidLoginCredentialException {
+        Scanner sc = new Scanner(System.in);
+        
+        String username = "";
+        String password = "";
+        
+        System.out.println("*** Reservation System :: Login ***\n");
         System.out.print("Enter username> ");
-        String username = sc.next();
+        username = sc.nextLine().trim();
         System.out.print("Enter password> ");
-        String password = sc.next();
+        password = sc.nextLine().trim();
      
-        try{
-            carReservationControllerRemote.customerLogin(username, password);
-            System.out.println("\nLogin Successful");
-            loggedIn = true;
-            customerMenu();
-        }catch(InvalidLoginCredentialException e){
-            System.err.println("\n" + e.getMessage());
+        if(username.length() > 0 && password.length() > 0) {
+            try{
+                currentCustomer = carReservationControllerRemote.customerLogin(username, password);
+                System.out.println("\nLogin Successful");
+                customerMenu();
+            }catch(InvalidLoginCredentialException e){
+                System.err.println("\n" + e.getMessage());
+            }
+        } else {
+            throw new InvalidLoginCredentialException("Missing login credential!");
         }
     }
     
     private void customerMenu(){
+        Scanner sc = new Scanner(System.in);
         
         while(true){
-            System.out.println("****Welcome to the Car Reservation client****");
-            System.out.println("(1) Search/Reserve car");
+            System.out.println("*** Merlion Car Reservation System ***");
+            System.out.println("(1) Search/Reserve Car");
             System.out.println("(2) Cancel Reservation");
-            System.out.println("(3) View Reservation Details");
-            System.out.println("(4) View All My Reservations");
-            System.out.println("(5) Log Out");
+            System.out.println("(3) View All My Reservations");
+            System.out.println("(4) Logout\n");
             
             System.out.print("> ");
             String response = sc.next();
@@ -121,16 +142,12 @@ public class MainApp {
                 case "2":
                     cancelReservation();
                     break;
-                    
-                case "3":
-                    viewReservationDetail();
-                    break;
                 
-                case "4":
+                case "3":
                     viewAllReservations();
                     break;
                     
-                case "5":
+                case "4":
                     customerLogOut();
                     return;
                     
@@ -141,7 +158,10 @@ public class MainApp {
     }
     
     private void searchCar(){
+        
       /*
+      Scanner sc = new Scanner(System.in);
+        
       try {
             System.out.println("\n****Search Car*****");
             DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -197,6 +217,8 @@ public class MainApp {
     
     private void reserveCar(){
         /*
+        Scanner sc = new Scanner(System.in);
+        
         for(int i = 0; i < ticket.getAvailableRoomTypes().size(); i++){
             RoomTypeEntity type = ticket.getAvailableRoomTypes().get(i);
             System.out.println("Enter number of " + type.getTypeName() + " to reserve:");
@@ -217,15 +239,17 @@ public class MainApp {
     
     
     private void cancelReservation(){
+        Scanner sc = new Scanner(System.in);
+        System.out.println("*** Reservation System :: Cancel Reservation ***\n");
         
-        Scanner scanner = new Scanner(System.in);
         String input;
         
-        System.out.print("Enter reservation ID> ");
+        System.out.print("Enter Reservation ID> ");
         Long resId = new Long(sc.nextInt()); 
-        System.out.println("\n****Cancel Reservation****");
-        System.out.printf("Confirm cancel Reservation (Reservation ID: %d )(Enter 'Y' to delete)> ", resId);
-        input = scanner.nextLine().trim();
+        viewReservationDetail(resId);
+        
+        System.out.printf("Confirm cancel reservation (Reservation ID: %d )(Enter 'Y' to delete)> ", resId);
+        input = sc.nextLine().trim();
             
         if(input.equals("Y"))
         {
@@ -249,9 +273,7 @@ public class MainApp {
            
     
     
-    private void viewReservationDetail(){       
-        System.out.print("Enter reservation ID> ");
-        Long resId = new Long(sc.nextInt());
+    private void viewReservationDetail(Long resId){       
         try {
             System.out.println("\n****View Reservation Details****");
             String details = carReservationControllerRemote.retrieveReservationDetails(resId);
@@ -263,12 +285,11 @@ public class MainApp {
     }
     
     private void viewAllReservations(){
-        try {
-        System.out.println("\n****Viewing all Reservation Records****");
+        Scanner sc = new Scanner(System.in);
+        System.out.println("*** Reservation System :: View All Reservations ***\n");
         List<RentalRecordEntity> reservations = carReservationControllerRemote.retrieveAllReservation();
         if(reservations.isEmpty()){
-            System.err.println("\nNo reservation records available.\n");
-            return;
+            System.out.println("\nNo reservation records available.\n");
         }
         
         for(RentalRecordEntity r: reservations){
@@ -279,15 +300,13 @@ public class MainApp {
                                 "Total Amount: $" + r.getTotalAmount());
             System.out.println();
         }
-        System.out.println("****End of Reservation Records****\n");
-       } catch (RentalRecordNotFoundException | EntityMismatchException ex) {
-            System.err.println(ex.getMessage());
-        } 
+        
+        System.out.println("Press any key to continue.....");
+        sc.nextLine();
     }
     
     private void customerLogOut() {
         carReservationControllerRemote.customerLogout();
-        loggedIn = false;
         System.out.println("\n****Logout successful****\n");
     }
 

@@ -54,7 +54,7 @@ public interface CarSessionBeanLocal {
 
     OutletEntity retrieveOutletById(Long outletId);
 
-    CarEntity retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException;
+    CarEntity retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException, InputDataValidationException;
     
     
 }

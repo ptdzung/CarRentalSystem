@@ -45,8 +45,13 @@ public class CarReservationController implements CarReservationControllerRemote,
     }
     
     @Override
-    public void customerLogin(String username, String password) throws InvalidLoginCredentialException {
+    public OwnCustomerEntity customerLogin(String username, String password) throws InvalidLoginCredentialException {
         customer = customerSessionBean.customerLogin(username, password);
+        if (customer != null) {
+            return customer;
+        } else {
+            throw new InvalidLoginCredentialException("Invalid login credentials!");
+        }
     }
     
     @Override
@@ -59,9 +64,8 @@ public class CarReservationController implements CarReservationControllerRemote,
     }
     
     @Override
-    public List<RentalRecordEntity> retrieveAllReservation() throws RentalRecordNotFoundException, EntityMismatchException {
-        System.err.println("customer id: " + customer.getCustomerId());
-        return customer.getRentalRecords();
+    public List<RentalRecordEntity> retrieveAllReservation() {
+        return reservationRecordSessionBean.retrieveRentalRecordsByCustomer(customer);
     }
     
     @Override
