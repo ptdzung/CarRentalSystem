@@ -6,8 +6,11 @@
 package carrsmanagementclient;
 
 import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.CustomerSessionBeanRemote;
+import ejb.session.stateless.DispatchSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
+import ejb.session.stateless.ReservationRecordSessionBeanRemote;
 import entity.EmployeeEntity;
 import java.util.Scanner;
 import util.exception.InvalidAccessRightException;
@@ -21,18 +24,26 @@ public class MainApp {
     private CarSessionBeanRemote carSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
+    private DispatchSessionBeanRemote dispatchSessionBeanRemote;
+    private ReservationRecordSessionBeanRemote reservationRecordSessionBeanRemote;
+    private CustomerSessionBeanRemote customerSessionBeanRemote;
     
     private EmployeeEntity currentEmployee;
     
     private SalesModule salesModule;
+    private OperationsModule operationsModule;
+    private ServiceModule serviceModule;
 
     public MainApp() {
     }
     
-    public MainApp(CarSessionBeanRemote carSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote) {
+    public MainApp(CarSessionBeanRemote carSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, DispatchSessionBeanRemote dispatchSessionBeanRemote, ReservationRecordSessionBeanRemote reservationRecordSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote) {
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
+        this.dispatchSessionBeanRemote = dispatchSessionBeanRemote;
+        this.reservationRecordSessionBeanRemote = reservationRecordSessionBeanRemote;
+        this.customerSessionBeanRemote = customerSessionBeanRemote;
     }
     
     public void runApp()
@@ -61,8 +72,8 @@ public class MainApp {
                         System.out.println("Login successful!\n");
                         
                         salesModule = new SalesModule(rentalRateSessionBeanRemote, carSessionBeanRemote, currentEmployee);
-//                        operationsModule = new OperationsModule(carSessionBeanRemote, employeeSessionBeanRemote, dispatchSessionBeanRemote, currentEmployee);
-//                        serviceModule = new ServiceModule(?, currentEmployee);
+                        operationsModule = new OperationsModule(carSessionBeanRemote, employeeSessionBeanRemote, dispatchSessionBeanRemote, currentEmployee);
+                        serviceModule = new ServiceModule(carSessionBeanRemote, reservationRecordSessionBeanRemote, customerSessionBeanRemote, currentEmployee);
                         menuMain();
                     }
                     catch(InvalidLoginCredentialException ex) 
@@ -136,25 +147,23 @@ public class MainApp {
                         System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
                     }
                 } else if (response == 2) {
-                    throw new UnsupportedOperationException("Not supported yet.");
-//                    try
-//                    {
-//                        operationsModule.menuOperations();
-//                    }
-//                    catch (InvalidAccessRightException ex)
-//                    {
-//                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
-//                    }
+                    try
+                    {
+                        operationsModule.menuOperations();
+                    }
+                    catch (InvalidAccessRightException ex)
+                    {
+                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                    }
                 } else if (response == 3) {
-                    throw new UnsupportedOperationException("Not supported yet.");
-//                    try
-//                    {
-//                        serviceModule.menuService();
-//                    }
-//                    catch (InvalidAccessRightException ex)
-//                    {
-//                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
-//                    }
+                    try
+                    {
+                        serviceModule.menuService();
+                    }
+                    catch (InvalidAccessRightException ex)
+                    {
+                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                    }
                 } else if (response == 4) {
                     break;
                 } else {
