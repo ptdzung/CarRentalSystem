@@ -77,22 +77,23 @@ public class MainApp {
     
     private void registerCustomer(){
         Scanner sc = new Scanner(System.in);
+        OwnCustomerEntity c = new OwnCustomerEntity();
         
         System.out.println("*** Reservation System :: Register New Customer ***\n");
         System.out.print("Enter name> ");
-        String name = sc.nextLine().trim();
+        c.setName(sc.nextLine().trim());
         System.out.print("Enter username> ");
-        String username = sc.nextLine().trim();
+        c.setUsername(sc.nextLine().trim());
         System.out.print("Enter password> ");
-        String password = sc.nextLine().trim();
+        c.setPassword(sc.nextLine().trim());
         System.out.print("Enter email address> ");
-        String email = sc.nextLine().trim();
+        c.setEmail(sc.nextLine().trim());
         
         try {
-            Long cusId = customerSessionBeanRemote.registerNewCustomer(name, username, password, email);
+            Long cusId = customerSessionBeanRemote.createNewOwnCustomer(c);
             System.out.println("New customer created successfully. Customer ID: " + cusId);
-        } catch (UsernameExistException | InputDataValidationException | UnknownPersistenceException ex) {
-            ex.getMessage();
+        } catch (InputDataValidationException | UnknownPersistenceException ex) {
+            System.err.println("\n" + ex.getMessage());
         }
     }
     

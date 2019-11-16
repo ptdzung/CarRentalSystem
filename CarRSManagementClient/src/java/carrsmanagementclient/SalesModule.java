@@ -116,7 +116,7 @@ public class SalesModule {
         System.out.print("Enter rate end time, blank if indefinite time (Input format: year, month, day, hour, minute)> ");
         input = sc.nextInt();
         if (input > 0) {
-            rentalRate.setStartDate(new Date(input-1900, sc.nextInt()-1, sc.nextInt(), sc.nextInt(), sc.nextInt()));
+            rentalRate.setEndDate(new Date(input-1900, sc.nextInt()-1, sc.nextInt(), sc.nextInt(), sc.nextInt()));
         }
         
         Set<ConstraintViolation<RentalRateEntity>>constraintViolations = validator.validate(rentalRate);
@@ -238,7 +238,7 @@ public class SalesModule {
         System.out.print("Enter rate end time, 0 if no change (Input format: year, month, day, hour, minute)> ");
         i = sc.nextInt();
         if (i > 0) {
-            rentalRate.setStartDate(new Date(i-1900, sc.nextInt()-1, sc.nextInt(), sc.nextInt(), sc.nextInt()));
+            rentalRate.setEndDate(new Date(i-1900, sc.nextInt()-1, sc.nextInt(), sc.nextInt(), sc.nextInt()));
         }
         
         Set<ConstraintViolation<RentalRateEntity>>constraintViolations = validator.validate(rentalRate);
@@ -246,7 +246,7 @@ public class SalesModule {
         if(constraintViolations.isEmpty()) {
             try {
                 rentalRateSessionBeanRemote.updateRentalRate(rentalRate);
-                System.out.println("Rental rate updated successfully!\\n");
+                System.out.println("Rental rate updated successfully!\n");
             } catch(RentalRateNotFoundException ex) {
                 System.out.println("An error has occurred while updating rental rate: " + ex.getMessage() + "\n");
             } catch(InputDataValidationException ex) {

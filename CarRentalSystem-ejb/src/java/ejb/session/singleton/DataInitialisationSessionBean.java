@@ -73,6 +73,7 @@ public class DataInitialisationSessionBean {
         em.persist(outlet3);
         em.flush();
         
+        employeeSessionBeanLocal.createNewEmployee(new EmployeeEntity("System Admin", AccessRightEnum.SYSADMIN, "sysadmin", "password", null));
         employeeSessionBeanLocal.createNewEmployee(new EmployeeEntity("Employee A1", AccessRightEnum.SALES, "a1sales", "password", outlet1));
         employeeSessionBeanLocal.createNewEmployee(new EmployeeEntity("Employee A2", AccessRightEnum.OPERATIONS, "a2operations", "password", outlet1));
         employeeSessionBeanLocal.createNewEmployee(new EmployeeEntity("Employee A3", AccessRightEnum.SERVICE, "a3service", "password", outlet1));

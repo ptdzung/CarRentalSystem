@@ -98,6 +98,7 @@ public class ServiceModule {
             CarEntity car = record.getCar();
             car.setOutlet(null);
             car.setStatus(StatusEnum.RENTED);  
+            System.out.println("Reservation ID " + record.getRentalRecordId() + " update: Car is picked up!");
         } catch (RentalRecordNotFoundException ex) {
             ex.getMessage();
         }
@@ -113,6 +114,7 @@ public class ServiceModule {
             car.setOutlet(record.getReturnOutlet());
             car.setStatus(StatusEnum.AVAILABLE);  
             car.setRentalRecord(null);
+            System.out.println("Reservation ID " + record.getRentalRecordId() + " update: Car is returned!");
         } catch (RentalRecordNotFoundException ex) {
             ex.getMessage();
         }

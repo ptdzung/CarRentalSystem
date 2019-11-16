@@ -9,6 +9,7 @@ import entity.CarCategoryEntity;
 import entity.CarEntity;
 import entity.CarModelEntity;
 import entity.OutletEntity;
+import entity.RentalRecordEntity;
 import java.util.List;
 import util.enumerator.StatusEnum;
 import util.exception.CarCategoryNotFoundException;
@@ -55,6 +56,8 @@ public interface CarSessionBeanLocal {
     OutletEntity retrieveOutletById(Long outletId);
 
     CarEntity retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException, InputDataValidationException;
+
+    CarEntity retrieveCarForAllocation(RentalRecordEntity record);
     
     
 }

@@ -126,6 +126,30 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             throw new CustomerNotFoundException("Customer Email " + email + " does not exist!");
         }
     }
-    
+
+    //Would recommend do this over createNewCustomer
+    @Override
+    public Long createNewOwnCustomer(OwnCustomerEntity customer) throws InputDataValidationException, UnknownPersistenceException {
+        try
+        {
+            Set<ConstraintViolation<OwnCustomerEntity>>constraintViolations = validator.validate(customer);
+        
+            if(constraintViolations.isEmpty())
+            {
+                em.persist(customer);
+                em.flush();
+
+                return customer.getCustomerId();
+            }
+            else
+            {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsForCustomer(constraintViolations));
+            }            
+        }
+        catch(PersistenceException ex) {
+                throw new UnknownPersistenceException(ex.getMessage());
+        }
+    }
+
     
 }

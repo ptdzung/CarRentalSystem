@@ -12,6 +12,7 @@ import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import ejb.session.stateless.ReservationRecordSessionBeanRemote;
 import entity.EmployeeEntity;
+import java.util.Date;
 import java.util.Scanner;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
@@ -129,10 +130,11 @@ public class MainApp {
             System.out.println("1: Sales");
             System.out.println("2: Operations");
             System.out.println("3: Customer Service");
-            System.out.println("4: Logout\n");
+            System.out.println("4: Car Allocation & Travel Dispatch Record Generation");
+            System.out.println("5: Logout\n");
             response = 0;
             
-            while(response < 1 || response > 3) {
+            while(response < 1 || response > 5) {
                 System.out.print("> ");
                 
                 response = sc.nextInt();
@@ -165,6 +167,8 @@ public class MainApp {
                         System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
                     }
                 } else if (response == 4) {
+                    doManualAllocation();
+                } else if (response == 5) {
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");  
@@ -173,6 +177,21 @@ public class MainApp {
             
             if (response == 4) break;
         }
+    }
+
+    private void doManualAllocation() {
+        Scanner sc = new Scanner(System.in);
+        
+        System.out.println("*** Merlion Car Rental Management System :: Manual Allocation ***\n");
+        System.out.print("Enter date of allocation (Input format: year, month, day)> ");
+        
+        if(!reservationRecordSessionBeanRemote.carAllocation(new Date(sc.nextInt()-1900, sc.nextInt()-1, sc.nextInt(), 2, 0))) {
+            System.out.println("There is no record for today!");
+        } else {
+            System.out.println("Car allocation and travel dispatch record generated successfully!");
+        }
+        System.out.print("Press any key to continue.....");
+        sc.nextLine();
     }
     
 }

@@ -140,7 +140,7 @@ public class OperationsModule {
         try {
             cm.setCarCategory(carSessionBeanRemote.retrieveCarCategoryByName(sc.nextLine().trim()));
         } catch(CarCategoryNotFoundException ex) {
-            ex.getMessage();
+            System.out.println(ex.getMessage() + "\n");
         }
         
         Set<ConstraintViolation<CarModelEntity>>constraintViolations = validator.validate(cm);
@@ -180,11 +180,12 @@ public class OperationsModule {
         try {
             Scanner sc = new Scanner(System.in);
             String input;
+            CarModelEntity cm;
 
             System.out.println("*** Management System :: Operations :: Update Car Model ***\n");
-            System.out.println("Enter Car Model ID> ");
-            Long carModelId = sc.nextLong();
-            CarModelEntity cm = carSessionBeanRemote.retrieveCarModelById(carModelId);
+            System.out.print("Enter Car Model ID> ");
+            input = sc.nextLine().trim();
+            cm = carSessionBeanRemote.retrieveCarModelById(Long.parseLong(input));
 
             System.out.print("Enter Car Make (blank if no change)> ");
             input = sc.nextLine().trim();
@@ -202,7 +203,7 @@ public class OperationsModule {
                 try {
                     cm.setCarCategory(carSessionBeanRemote.retrieveCarCategoryByName(input));
                 } catch(CarCategoryNotFoundException ex) {
-                    ex.getMessage();
+                    System.out.println(ex.getMessage() + "\n");
                 }
             }
 
@@ -259,7 +260,7 @@ public class OperationsModule {
         try {
             car.setCarModel(carSessionBeanRemote.retrieveCarModel(make, modelName));
         } catch (CarModelNotFoundException ex) {
-            ex.getMessage();
+            System.out.println(ex.getMessage() + "\n");
         }
         
         while(true)
@@ -371,10 +372,11 @@ public class OperationsModule {
         OutletEntity outlet = currentEmployee.getOutlet();
         
         List<TravelDispatchRecordEntity> list = dispatchSessionBeanRemote.retrieveTravelDispatchRecordByDate(date, outlet);
-        System.out.printf("%20s%16s%20s%12s\n", "Dispatch Record ID", "Rental Record ID", "Driver", "Has Arrived");
+        
         
         if(list.isEmpty()) System.out.println("No transit to be done");
         else {
+            System.out.printf("%20s%16s%20s%12s\n", "Dispatch Record ID", "Rental Record ID", "Driver", "Has Arrived");
             for(TravelDispatchRecordEntity r : list) {
                 System.out.printf("%20s%16s%20s%12s\n", r.getTravelDispatchRecordId().toString(), r.getRentalRecord().getRentalRecordId().toString(), "" + r.getDriver().getName(), r.getStatus().toString());
             }
@@ -397,12 +399,12 @@ public class OperationsModule {
             EmployeeEntity emp = employeeSessionBeanRemote.retrieveEmployeeByUsername(username);
             if (record.getDriver() == null) {
                 record.setDriver(emp);
-                System.out.println("Successfully assigned Employee " + emp.getName() + " to Dispatch Record ID " + input);
+                System.out.println("Successfully assigned employee " + emp.getName() + " to Dispatch Record ID " + input);
             } else {
                 System.out.println("A driver is already assigned to Dispatch Record ID " + input);
             }
         } catch (TravelDispatchRecordNotFoundException | EmployeeNotFoundException ex) {
-            ex.getMessage();
+            System.out.println(ex.getMessage() + "\n");
         }
         
     }
@@ -418,7 +420,7 @@ public class OperationsModule {
             record.setStatus(Boolean.TRUE);
             record.getRentalRecord().getCar().setOutlet(record.getReceivingOutlet());
         } catch (TravelDispatchRecordNotFoundException ex) {
-            ex.getMessage();
+            System.out.println(ex.getMessage() + "\n");
         }
     }
     
@@ -480,7 +482,7 @@ public class OperationsModule {
         if(constraintViolations.isEmpty()) {
             try {
                 carSessionBeanRemote.updateCar(car);
-                System.out.println("Car updated successfully!\\n");
+                System.out.println("Car updated successfully!\n");
             } catch(CarNotFoundException ex) {
                 System.out.println("An error has occurred while updating car: " + ex.getMessage() + "\n");
             } catch(InputDataValidationException ex) {

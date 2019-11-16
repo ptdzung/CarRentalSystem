@@ -136,7 +136,7 @@ public class ReservationRecordSessionBean implements ReservationRecordSessionBea
             }
         }
         
-        return list;
+        return returnList;
     }
 
     @Override
@@ -145,6 +145,19 @@ public class ReservationRecordSessionBean implements ReservationRecordSessionBea
         query.setParameter("inCustomer", cus);
         
         return query.getResultList();
+    }
+
+    @Override
+    public boolean carAllocation(Date date) {
+        List<RentalRecordEntity> rentalRecords = retrieveRentalRecordByDate(date);
+        if (rentalRecords.isEmpty()) {
+            return false;
+        }
+        
+        for(RentalRecordEntity r: rentalRecords) {
+            r.setCar(carSessionBean.retrieveCarForAllocation(r));
+        }
+        return true;
     }
     
     

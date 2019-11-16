@@ -27,4 +27,6 @@ public interface ReservationRecordSessionBeanLocal {
     public List<RentalRecordEntity> retrieveRentalRecordByDate(Date date);
 
     List<RentalRecordEntity> retrieveRentalRecordsByCustomer(CustomerEntity cus);
+
+    boolean carAllocation(Date date);
 }

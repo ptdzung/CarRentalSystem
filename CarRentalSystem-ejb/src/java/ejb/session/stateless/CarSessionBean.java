@@ -9,8 +9,12 @@ import entity.CarCategoryEntity;
 import entity.CarEntity;
 import entity.CarModelEntity;
 import entity.OutletEntity;
+import entity.RentalRecordEntity;
+import entity.TravelDispatchRecordEntity;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -40,6 +44,9 @@ import util.exception.UnknownPersistenceException;
 @Local(CarSessionBeanLocal.class)
 @Remote(CarSessionBeanRemote.class)
 public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal {
+
+    @EJB
+    private DispatchSessionBeanLocal dispatchSessionBeanLocal;
 
     @PersistenceContext(unitName = "CarRentalManagementSystem-ejbPU")
     private EntityManager em;
@@ -165,11 +172,10 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             if(constraintViolations.isEmpty())
             {
                 CarEntity carToUpdate = retrieveCarById(car.getCarId());
-
+                
+                carToUpdate.setLicensePlate(car.getLicensePlate());
                 carToUpdate.setStatus(car.getStatus());
                 carToUpdate.setOutlet(car.getOutlet());
-                carToUpdate.setRentedTo(car.getRentedTo());
-                carToUpdate.setRentalRecord(car.getRentalRecord());
             }
             else
             {
@@ -199,7 +205,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         CarEntity car = retrieveCarById(carId);
         CarModelEntity carModel = car.getCarModel();
         
-        if(car.getRentalRecord() != null) {
+        if(car.getRentalRecord() == null) {
             carModel.removeCar(car);
             em.remove(car);
             return true;
@@ -264,11 +270,10 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         if (carModel != null) {
             Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.carModel = :inModel");
             query.setParameter("inModel", carModel);
-            CarEntity car = (CarEntity)query.getSingleResult();
-            if (car != null) {
-                return car;
-            } else {
-                throw new CarNotFoundException("This does not exist!");
+            try {
+                return (CarEntity)query.getSingleResult();
+            } catch (NoResultException | NonUniqueResultException ex) {
+                throw new CarNotFoundException("Car does not exist!");
             }
         } else {
             throw new CarModelNotFoundException("Car model " + make + " " + modelName + " does not exist!");
@@ -304,11 +309,9 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         Query query = em.createQuery("SELECT cm FROM CarModelEntity cm WHERE cm.make = :inMake AND cm.modelName = :inModelName");
         query.setParameter("inMake", make);
         query.setParameter("inModelName", modelName);
-        CarModelEntity carModel = (CarModelEntity)query.getSingleResult();
-        
-        if(carModel != null) {
-            return carModel;
-        } else {
+        try {
+            return (CarModelEntity)query.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException ex) {
             throw new CarModelNotFoundException("Car model " + make + " " + modelName + " does not exist!");
         }
     }
@@ -320,21 +323,89 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     @Override
     public CarEntity retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException, InputDataValidationException {
-        if (licensePlate.length() != 8) {
+        if (licensePlate.length() == 8) {
             Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.licensePlate = :inPlate");
             query.setParameter("inPlate", licensePlate);
-            CarEntity car = (CarEntity)query.getSingleResult();
-
-            if(car != null) {
-                return car;
-            } else {
-                throw new CarNotFoundException("Car license plate " + licensePlate + " does not exist!");
+            try {
+                return (CarEntity)query.getSingleResult();
+            } catch (NoResultException | NonUniqueResultException ex) {
+                throw new CarNotFoundException("License plate " + licensePlate + " does not exist");
             }
         } else {
             throw new InputDataValidationException("License plate input is invalid!");
         }
     }
-    
+
+    @Override
+    public CarEntity retrieveCarForAllocation(RentalRecordEntity record) {
+        CarCategoryEntity category = record.getCarCategory();
+        OutletEntity pickupOutlet = record.getPickupOutlet();
+        Date pickupDate = record.getRentedFrom();
+        
+        Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.carModel.carCategory = :inCategory");
+        query.setParameter("inCategory", category);
+        List<CarEntity> cars = query.getResultList();
+        if (cars.isEmpty()) return null;
+        
+        //Car is at outlet already
+        for (CarEntity c : cars) {
+            if (c.getStatus().equals(StatusEnum.AVAILABLE) && c.getOutlet().equals(pickupOutlet)) {
+                return c;
+            }
+        }
+        //Car is currently rented, but will be return to outlet before pickup time
+        for (CarEntity c : cars) {
+            if (c.getStatus().equals(StatusEnum.RENTED) && c.getRentalRecord().getReturnOutlet().equals(pickupOutlet)) {
+                if (c.getRentedTo().compareTo(pickupDate) <= 0) return c;
+            }
+        }
+        //Car is currently at another outlet -> need transit
+        for (CarEntity c : cars) {
+            if (c.getStatus().equals(StatusEnum.AVAILABLE) && !c.getOutlet().equals(pickupOutlet)) {
+                try {
+                    dispatchSessionBeanLocal.createNewTravelDispatchRecord(new TravelDispatchRecordEntity(pickupOutlet, record));
+                } catch (InputDataValidationException | UnknownPersistenceException ex) {
+                    ex.getMessage();
+                }
+                return c;
+            }
+        }
+        //Car is currently rented and going to be returned to another outlet -> need transit
+        for (CarEntity c : cars) {
+            if (c.getStatus().equals(StatusEnum.RENTED)) {
+                if (c.getRentedTo().compareTo(pickupDate) <= 7200) {
+                    try {
+                        dispatchSessionBeanLocal.createNewTravelDispatchRecord(new TravelDispatchRecordEntity(pickupOutlet, record));
+                    } catch (InputDataValidationException | UnknownPersistenceException ex) {
+                        ex.getMessage();
+                    }
+                    return c;
+                }
+            }
+        }
+        
+        return null;
+        
+//        if (record.getCarModel() == null) {
+//            List<CarModelEntity> models = category.getCarModels();
+//            for (CarModelEntity cm : models) {
+//                List<CarEntity> cars = cm.getCars();
+//                for (CarEntity c : cars) {
+//                    if (c.getOutlet().equals(pickupOutlet)) {
+//                        return c;
+//                    } else if (c.getRentedTo() == null) {
+//                        return c;
+//                    } else if (c.getRentalRecord().getReturnOutlet().equals(pickupOutlet)) {
+//                        if (c.getRentedTo().compareTo(pickupDate) <= 0) {
+//                            return c;
+//                        }
+//                    } else if (c.getOutlet() == null && c.getRentedTo().compareTo(record.getRentedFrom()) <= 7200) {
+//                        
+//                    }
+//                }
+//            }
+//        }
+    }
     
     
 }

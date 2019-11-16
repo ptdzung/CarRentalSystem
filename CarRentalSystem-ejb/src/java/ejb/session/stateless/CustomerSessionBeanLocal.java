@@ -26,5 +26,7 @@ public interface CustomerSessionBeanLocal {
     public OwnCustomerEntity customerLogin(String username, String password) throws InvalidLoginCredentialException;
 
     CustomerEntity retrieveCustomerByEmail(String email) throws CustomerNotFoundException;
+
+    Long createNewOwnCustomer(OwnCustomerEntity customer) throws InputDataValidationException, UnknownPersistenceException;
     
 }

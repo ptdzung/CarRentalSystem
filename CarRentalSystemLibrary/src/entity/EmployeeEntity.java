@@ -54,8 +54,7 @@ public class EmployeeEntity implements Serializable {
     private String password;
 
     //Entity relationship
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    @ManyToOne
     private OutletEntity outlet;
     
     @OneToMany(mappedBy = "driver")

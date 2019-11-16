@@ -3,16 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package util.enumerator;
+package ejb.session.stateless;
 
 /**
  *
  * @author Pham The Dzung
  */
-public enum AccessRightEnum {
-    SALES,
-    OPERATIONS,
-    SERVICE,
-    STANDARD,
-    SYSADMIN
+public interface EjbTimerSessionBeanLocal {
+    
 }

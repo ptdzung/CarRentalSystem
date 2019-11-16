@@ -37,7 +37,7 @@ public class CarEntity implements Serializable {
     
     @Column(nullable = false, unique = true, length = 8)
     @NotNull
-    @Size(min = 8, max = 8)
+    @Size(max = 8)
     private String licensePlate;
 
     @Enumerated(EnumType.STRING)

@@ -37,8 +37,7 @@ public class TravelDispatchRecordEntity implements Serializable {
     @JoinColumn(nullable = false)
     private OutletEntity receivingOutlet;
     
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    @ManyToOne
     private EmployeeEntity driver;
     
     @OneToOne(mappedBy = "dispatchRecord")
@@ -48,11 +47,10 @@ public class TravelDispatchRecordEntity implements Serializable {
         this.status = false;
     }
 
-    public TravelDispatchRecordEntity(OutletEntity receivingOutlet, EmployeeEntity driver, RentalRecordEntity rentalRecord) {
+    public TravelDispatchRecordEntity(OutletEntity receivingOutlet, RentalRecordEntity rentalRecord) {
         this();
         
         this.receivingOutlet = receivingOutlet;
-        this.driver = driver;
         this.rentalRecord = rentalRecord;
     }
     
