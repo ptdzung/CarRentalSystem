@@ -1,0 +1,232 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI (http://jax-ws.java.net). RI's version is Metro/2.4.3 (RELEASE-2.4.3-ad3323c; 2019-01-21T17:46:06+0000) JAXWS-RI/2.3.2 JAXWS-API/2.3.2 JAXB-RI/2.3.2 JAXB-API/2.3.2 git-revision#unknown. --><xs:schema xmlns:tns="http://ws.session.ejb/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://ws.session.ejb/">
+
+<xs:element name="EntityMismatchException" type="tns:EntityMismatchException"/>
+
+<xs:element name="InvalidLoginCredentialException" type="tns:InvalidLoginCredentialException"/>
+
+<xs:element name="RentalRecordNotFoundException" type="tns:RentalRecordNotFoundException"/>
+
+<xs:element name="cancelReservation" type="tns:cancelReservation"/>
+
+<xs:element name="cancelReservationResponse" type="tns:cancelReservationResponse"/>
+
+<xs:element name="partnerLogin" type="tns:partnerLogin"/>
+
+<xs:element name="partnerLoginResponse" type="tns:partnerLoginResponse"/>
+
+<xs:element name="retrievePartnerReservationDetails" type="tns:retrievePartnerReservationDetails"/>
+
+<xs:element name="retrievePartnerReservationDetailsResponse" type="tns:retrievePartnerReservationDetailsResponse"/>
+
+<xs:element name="retrieveRentalRecordsByPartner" type="tns:retrieveRentalRecordsByPartner"/>
+
+<xs:element name="retrieveRentalRecordsByPartnerResponse" type="tns:retrieveRentalRecordsByPartnerResponse"/>
+
+<xs:complexType name="cancelReservation">
+<xs:sequence>
+<xs:element name="resId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="cancelReservationResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="RentalRecordNotFoundException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveRentalRecordsByPartner">
+<xs:sequence>
+<xs:element name="part" type="tns:partnerEntity" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="partnerEntity">
+<xs:sequence>
+<xs:element name="name" type="xs:string" minOccurs="0"/>
+<xs:element name="partnerId" type="xs:long" minOccurs="0"/>
+<xs:element name="password" type="xs:string" minOccurs="0"/>
+<xs:element name="username" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveRentalRecordsByPartnerResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:rentalRecordEntity" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="rentalRecordEntity">
+<xs:sequence>
+<xs:element name="cancelled" type="xs:boolean" minOccurs="0"/>
+<xs:element name="cancelledDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="car" type="tns:carEntity" minOccurs="0"/>
+<xs:element name="carCategory" type="tns:carCategoryEntity" minOccurs="0"/>
+<xs:element name="carModel" type="tns:carModelEntity" minOccurs="0"/>
+<xs:element name="creditCardNumber" type="xs:string" minOccurs="0"/>
+<xs:element name="customer" type="tns:customerEntity" minOccurs="0"/>
+<xs:element name="dispatchRecord" type="tns:travelDispatchRecordEntity" minOccurs="0"/>
+<xs:element name="hasPaid" type="xs:boolean"/>
+<xs:element name="pickupOutlet" type="tns:outletEntity" minOccurs="0"/>
+<xs:element name="rentalDays" type="tns:rentalDayEntity" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="rentalRecordId" type="xs:long" minOccurs="0"/>
+<xs:element name="rentedFrom" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="rentedOn" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="rentedTo" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="returnOutlet" type="tns:outletEntity" minOccurs="0"/>
+<xs:element name="totalAmount" type="xs:decimal" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="carEntity">
+<xs:sequence>
+<xs:element name="carId" type="xs:long" minOccurs="0"/>
+<xs:element name="carModel" type="tns:carModelEntity" minOccurs="0"/>
+<xs:element name="licensePlate" type="xs:string" minOccurs="0"/>
+<xs:element name="outlet" type="tns:outletEntity" minOccurs="0"/>
+<xs:element name="rentalRecord" type="tns:rentalRecordEntity" minOccurs="0"/>
+<xs:element name="rentedTo" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="status" type="tns:statusEnum" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="carModelEntity">
+<xs:sequence>
+<xs:element name="carCategory" type="tns:carCategoryEntity" minOccurs="0"/>
+<xs:element name="carModelId" type="xs:long" minOccurs="0"/>
+<xs:element name="make" type="xs:string" minOccurs="0"/>
+<xs:element name="modelName" type="xs:string" minOccurs="0"/>
+<xs:element name="rentalRecords" type="tns:rentalRecordEntity" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="status" type="tns:statusEnum" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="carCategoryEntity">
+<xs:sequence>
+<xs:element name="carCategoryId" type="xs:long" minOccurs="0"/>
+<xs:element name="categoryName" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="outletEntity">
+<xs:sequence>
+<xs:element name="closeTime" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="name" type="xs:string" minOccurs="0"/>
+<xs:element name="openTime" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="outletId" type="xs:long" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="customerEntity">
+<xs:sequence>
+<xs:element name="customerId" type="xs:long" minOccurs="0"/>
+<xs:element name="email" type="xs:string" minOccurs="0"/>
+<xs:element name="name" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="travelDispatchRecordEntity">
+<xs:sequence>
+<xs:element name="driver" type="tns:employeeEntity" minOccurs="0"/>
+<xs:element name="receivingOutlet" type="tns:outletEntity" minOccurs="0"/>
+<xs:element name="rentalRecord" type="tns:rentalRecordEntity" minOccurs="0"/>
+<xs:element name="status" type="xs:boolean" minOccurs="0"/>
+<xs:element name="travelDispatchRecordId" type="xs:long" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="employeeEntity">
+<xs:sequence>
+<xs:element name="accessRightEnum" type="tns:accessRightEnum" minOccurs="0"/>
+<xs:element name="employeeId" type="xs:long" minOccurs="0"/>
+<xs:element name="name" type="xs:string" minOccurs="0"/>
+<xs:element name="outlet" type="tns:outletEntity" minOccurs="0"/>
+<xs:element name="password" type="xs:string" minOccurs="0"/>
+<xs:element name="username" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="rentalDayEntity">
+<xs:sequence>
+<xs:element name="rentalDay" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="rentalDayId" type="xs:long" minOccurs="0"/>
+<xs:element name="rentalRate" type="tns:rentalRateEntity" minOccurs="0"/>
+<xs:element name="rentalRecord" type="tns:rentalRecordEntity" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="rentalRateEntity">
+<xs:sequence>
+<xs:element name="carCategory" type="tns:carCategoryEntity" minOccurs="0"/>
+<xs:element name="endDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="rateName" type="xs:string" minOccurs="0"/>
+<xs:element name="ratePerDay" type="xs:decimal" minOccurs="0"/>
+<xs:element name="rentalDays" type="tns:rentalDayEntity" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="rentalRateId" type="xs:long" minOccurs="0"/>
+<xs:element name="startDate" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="status" type="tns:statusEnum" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrievePartnerReservationDetails">
+<xs:sequence>
+<xs:element name="resId" type="xs:long"/>
+<xs:element name="partnerId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrievePartnerReservationDetailsResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="EntityMismatchException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="partnerLogin">
+<xs:sequence>
+<xs:element name="username" type="xs:string" minOccurs="0"/>
+<xs:element name="password" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="partnerLoginResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:partnerEntity" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="InvalidLoginCredentialException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:simpleType name="statusEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="AVAILABLE"/>
+<xs:enumeration value="RENTED"/>
+<xs:enumeration value="REPAIR"/>
+<xs:enumeration value="DISABLED"/>
+</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="accessRightEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="SALES"/>
+<xs:enumeration value="OPERATIONS"/>
+<xs:enumeration value="SERVICE"/>
+<xs:enumeration value="STANDARD"/>
+<xs:enumeration value="SYSADMIN"/>
+</xs:restriction>
+</xs:simpleType>
+</xs:schema>
