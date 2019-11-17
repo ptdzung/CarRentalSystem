@@ -8,6 +8,7 @@ package ejb.session.stateful;
 import ejb.session.stateless.CustomerSessionBeanLocal;
 import ejb.session.stateless.ReservationRecordSessionBeanLocal;
 import entity.OwnCustomerEntity;
+import entity.PartnerEntity;
 import entity.RentalRecordEntity;
 import java.util.List;
 import javax.ejb.EJB;
@@ -39,6 +40,7 @@ public class CarReservationController implements CarReservationControllerRemote,
     private EntityManager em;
     
     private OwnCustomerEntity customer;
+    private PartnerEntity partner;
     private String email;
 
     public CarReservationController() {
@@ -64,18 +66,28 @@ public class CarReservationController implements CarReservationControllerRemote,
     }
     
     @Override
-    public List<RentalRecordEntity> retrieveAllReservation() {
+    public List<RentalRecordEntity> retrieveAllCustomerReservation() {
         return reservationRecordSessionBean.retrieveRentalRecordsByCustomer(customer);
     }
     
     @Override
-    public String retrieveReservationDetails(Long resId) throws RentalRecordNotFoundException, EntityMismatchException {
-        return reservationRecordSessionBean.retrieveReservationDetails(resId, customer.getCustomerId());
+    public String retrieveCustomerReservationDetails(Long resId) throws RentalRecordNotFoundException, EntityMismatchException {
+        return reservationRecordSessionBean.retrieveCustomerReservationDetails(resId, customer.getCustomerId());
+    }
+    
+    @Override
+    public String retrievePartnerReservationDetails(Long resId) throws RentalRecordNotFoundException, EntityMismatchException {
+        return reservationRecordSessionBean.retrieveCustomerReservationDetails(resId, partner.getPartnerId());
     }
     
     @Override
     public String cancelReservation(Long resId) throws RentalRecordNotFoundException {
         return reservationRecordSessionBean.cancelReservation(resId);
+    }
+    
+    @Override
+    public List<RentalRecordEntity> retrieveAllPartnerReservation() {
+       return reservationRecordSessionBean.retrieveRentalRecordsByPartner(partner);
     }
     
 }
