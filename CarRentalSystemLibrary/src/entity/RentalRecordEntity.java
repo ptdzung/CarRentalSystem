@@ -112,28 +112,32 @@ public class RentalRecordEntity implements Serializable {
         Calendar calendar = Calendar.getInstance();
         this.rentedOn = calendar.getTime();
         this.cancelled = false;
-        this.hasPaid = false;
         
         rentalDays = new ArrayList<>();
     }
 
     //Own customer's rental
     public RentalRecordEntity(Date rentedFrom, Date rentedTo, String creditCard, OwnCustomerEntity customer, 
-                              CarEntity car, CarModelEntity carModel, CarCategoryEntity carCategory) {
+                              CarModelEntity carModel, CarCategoryEntity carCategory, BigDecimal totalAmount,
+                              OutletEntity pickupOutlet, OutletEntity returnOutlet, boolean hasPaid) {
         this();
         
         this.rentedFrom = rentedFrom;
         this.rentedTo = rentedTo;
         this.creditCardNumber = creditCard;
         this.customer = customer;
-        this.car = car;
         this.carModel = carModel;
         this.carCategory = carCategory;
+        this.totalAmount = totalAmount;
+        this.pickupOutlet = pickupOutlet;
+        this.returnOutlet = returnOutlet;
+        this.hasPaid = hasPaid;
     }
     
     //Partner's rental
     public RentalRecordEntity(Date rentedFrom, Date rentedTo, String creditCard, PartnerEntity partner, CustomerEntity customer, 
-                              CarEntity car, CarModelEntity carModel, CarCategoryEntity carCategory) {
+                              CarModelEntity carModel, CarCategoryEntity carCategory, BigDecimal totalAmount,
+                              OutletEntity pickupOutlet, OutletEntity returnOutlet, boolean hasPaid) {
         this();
         
         this.rentedFrom = rentedFrom;
@@ -141,9 +145,12 @@ public class RentalRecordEntity implements Serializable {
         this.creditCardNumber = creditCard;
         this.partner = partner;
         this.customer = customer;
-        this.car = car;
         this.carModel = carModel;
         this.carCategory = carCategory;
+        this.totalAmount = totalAmount;
+        this.pickupOutlet = pickupOutlet;
+        this.returnOutlet = returnOutlet;
+        this.hasPaid = hasPaid;
     }
     
     
@@ -259,14 +266,6 @@ public class RentalRecordEntity implements Serializable {
         this.returnOutlet = returnOutlet;
     }
 
-    public List<RentalDayEntity> getRentalDays() {
-        return rentalDays;
-    }
-
-    public void setRentalDays(List<RentalDayEntity> rentalDays) {
-        this.rentalDays = rentalDays;
-    }
-
     public String getCreditCardNumber() {
         return creditCardNumber;
     }
@@ -289,6 +288,14 @@ public class RentalRecordEntity implements Serializable {
 
     public void setHasPaid(boolean hasPaid) {
         this.hasPaid = hasPaid;
+    }
+
+    public List<RentalDayEntity> getRentalDays() {
+        return rentalDays;
+    }
+
+    public void setRentalDays(List<RentalDayEntity> rentalDays) {
+        this.rentalDays = rentalDays;
     }
 
     

@@ -30,7 +30,7 @@ public class RentalDayEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rentalDayId;
     
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     @NotNull
     private Date rentalDay;

@@ -111,14 +111,6 @@ public class RentalRateEntity implements Serializable {
     public void setRatePerDay(BigDecimal ratePerDay) {
         this.ratePerDay = ratePerDay;
     }
-//
-//    public RateTypeEnum getRateType() {
-//        return rateType;
-//    }
-//
-//    public void setRateType(RateTypeEnum rateType) {
-//        this.rateType = rateType;
-//    }
 
     public Date getStartDate() {
         return startDate;
@@ -144,19 +136,19 @@ public class RentalRateEntity implements Serializable {
         this.carCategory = carCategory;
     }
 
-    public List<RentalDayEntity> getRentalDays() {
-        return rentalDays;
-    }
-
-    public void setRentalDays(List<RentalDayEntity> rentalDays) {
-        this.rentalDays = rentalDays;
-    }
-
     public StatusEnum getStatus() {
         return status;
     }
 
     public void setStatus(StatusEnum status) {
         this.status = status;
+    }
+
+    public List<RentalDayEntity> getRentalDays() {
+        return rentalDays;
+    }
+
+    public void setRentalDays(List<RentalDayEntity> rentalDays) {
+        this.rentalDays = rentalDays;
     }
 }

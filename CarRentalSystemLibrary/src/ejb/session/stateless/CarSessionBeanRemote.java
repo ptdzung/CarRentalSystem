@@ -10,6 +10,7 @@ import entity.CarEntity;
 import entity.CarModelEntity;
 import entity.OutletEntity;
 import entity.RentalRecordEntity;
+import java.util.Date;
 import java.util.List;
 import util.enumerator.StatusEnum;
 import util.exception.CarCategoryNotFoundException;
@@ -17,6 +18,7 @@ import util.exception.CarModelNotFoundException;
 import util.exception.CarNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.LicensePlateExistException;
+import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -58,6 +60,8 @@ public interface CarSessionBeanRemote {
     CarEntity retrieveCarByLicensePlate(String licensePlate) throws CarNotFoundException, InputDataValidationException;
 
     CarEntity retrieveCarForAllocation(RentalRecordEntity record);
+
+    List<CarEntity> searchCar(CarCategoryEntity category, CarModelEntity model, Date startDate, Date endDate, OutletEntity pickupOutlet);
     
     
 }
