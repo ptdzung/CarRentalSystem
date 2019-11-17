@@ -335,6 +335,26 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             throw new InputDataValidationException("License plate input is invalid!");
         }
     }
+    
+    public List<CarCategoryEntity> searchCar(Date startDate,Date endDate, String pickupOutlet, String returnOutlet) {
+        Query query1 = em.createQuery("SELECT o FROM OutletEntity o WHERE o.openTime = :inOpenTime AND o.name = :inName");
+        query1.setParameter("inOpenTime", startDate);
+        query1.setParameter("inName", pickupOutlet);
+        OutletEntity outlet1 = (OutletEntity)query1.getSingleResult();
+        
+        Query query2 = em.createQuery("SELECT o FROM OutletEntity o WHERE o.openTime = :inOpenTime AND o.name = :inName");
+        query2.setParameter("inOpenTime", endDate);
+        query2.setParameter("inName", returnOutlet);
+        OutletEntity outlet2 = (OutletEntity)query2.getSingleResult();
+        
+        List<CarEntity> allCars = outlet1.getCars();
+        
+        for(CarEntity car: allCars){
+            
+        }
+        
+        return null;
+    }
 
     @Override
     public CarEntity retrieveCarForAllocation(RentalRecordEntity record) {
