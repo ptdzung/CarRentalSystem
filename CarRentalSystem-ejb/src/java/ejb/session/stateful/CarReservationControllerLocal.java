@@ -25,10 +25,14 @@ public interface CarReservationControllerLocal {
 
     public OwnCustomerEntity customerLogin(String username, String password) throws InvalidLoginCredentialException;
 
-    public List<RentalRecordEntity> retrieveAllReservation();
+    public List<RentalRecordEntity> retrieveAllCustomerReservation();
 
-    public String retrieveReservationDetails(Long resId) throws RentalRecordNotFoundException, EntityMismatchException;
+    public String retrieveCustomerReservationDetails(Long resId) throws RentalRecordNotFoundException, EntityMismatchException;
 
     public String cancelReservation(Long resId) throws RentalRecordNotFoundException;
+    
+    public List<RentalRecordEntity> retrieveAllPartnerReservation();
+
+    public String retrievePartnerReservationDetails(Long resId) throws RentalRecordNotFoundException, EntityMismatchException;
     
 }
