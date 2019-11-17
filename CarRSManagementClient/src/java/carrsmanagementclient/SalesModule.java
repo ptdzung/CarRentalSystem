@@ -107,13 +107,13 @@ public class SalesModule {
             ex.getMessage();
         }
         
-        System.out.print("Enter rate start time, 0 if indefinite time (Input format: year, month, day, hour, minute)> ");
+        System.out.print("Enter rate start time, 0 if indefinite time (Input format: year month day hour minute)> ");
         int input = sc.nextInt();
         if (input > 0) {
             rentalRate.setStartDate(new Date(input-1900, sc.nextInt()-1, sc.nextInt(), sc.nextInt(), sc.nextInt()));
         }
         
-        System.out.print("Enter rate end time, blank if indefinite time (Input format: year, month, day, hour, minute)> ");
+        System.out.print("Enter rate end time, blank if indefinite time (Input format: year month day hour minute)> ");
         input = sc.nextInt();
         if (input > 0) {
             rentalRate.setEndDate(new Date(input-1900, sc.nextInt()-1, sc.nextInt(), sc.nextInt(), sc.nextInt()));
@@ -229,13 +229,13 @@ public class SalesModule {
             }
         }
         
-        System.out.print("Enter rate start time, 0 if no change (Input format: year, month, day, hour, minute)> ");
+        System.out.print("Enter rate start time, 0 if no change (Input format: year month day hour minute)> ");
         int i = sc.nextInt();
         if (i > 0) {
             rentalRate.setStartDate(new Date(i-1900, sc.nextInt()-1, sc.nextInt(), sc.nextInt(), sc.nextInt()));
         }
         
-        System.out.print("Enter rate end time, 0 if no change (Input format: year, month, day, hour, minute)> ");
+        System.out.print("Enter rate end time, 0 if no change (Input format: year month day hour minute)> ");
         i = sc.nextInt();
         if (i > 0) {
             rentalRate.setEndDate(new Date(i-1900, sc.nextInt()-1, sc.nextInt(), sc.nextInt(), sc.nextInt()));

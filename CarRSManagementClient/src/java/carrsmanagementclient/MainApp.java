@@ -175,7 +175,7 @@ public class MainApp {
                 }
             }
             
-            if (response == 4) break;
+            if (response == 5) break;
         }
     }
 
