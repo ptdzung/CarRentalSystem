@@ -5,29 +5,35 @@
  */
 package ejb.session.stateless;
 
-import entity.RentalRateEntity;
+import entity.CustomerEntity;
+import entity.PartnerEntity;
+import entity.RentalRecordEntity;
+import util.exception.EntityMismatchException;
+import util.exception.RentalRecordNotFoundException;
+import java.util.Date;
 import java.util.List;
-import util.exception.CarCategoryNotFoundException;
-import util.exception.InputDataValidationException;
-import util.exception.RentalRateNotFoundException;
-import util.exception.UnknownPersistenceException;
 
 /**
  *
- * @author Pham The Dzung
+ * @author Trishpal
  */
-public interface RentalRateSessionBeanLocal {
-
-    Long createNewRentalRate(RentalRateEntity rentalRate) throws InputDataValidationException, UnknownPersistenceException;
-
-    RentalRateEntity retrieveRentalRate(String rateName, String categoryName) throws RentalRateNotFoundException, CarCategoryNotFoundException;
-
-    void updateRentalRate(RentalRateEntity rate) throws RentalRateNotFoundException, InputDataValidationException;
+public interface ReservationRecordSessionBeanLocal {
     
-    RentalRateEntity retrieveRentalRateById(Long rentalRateId) throws RentalRateNotFoundException;
-    
-    boolean deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException;
+    public String retrieveCustomerReservationDetails(Long resId, Long customerId) throws RentalRecordNotFoundException, EntityMismatchException;
 
-    List<RentalRateEntity> retrieveAllRentalRates();
+    public String cancelReservation(long resId) throws RentalRecordNotFoundException;
     
+    public RentalRecordEntity retrieveReservationById(Long resId) throws RentalRecordNotFoundException;
+
+    public List<RentalRecordEntity> retrieveRentalRecordByDate(Date date);
+
+    List<RentalRecordEntity> retrieveRentalRecordsByCustomer(CustomerEntity cus);
+    
+    public List<RentalRecordEntity> retrieveRentalRecordsByPartner(PartnerEntity part);
+
+    boolean carAllocation(Date date);
+
+    public String retrievePartnerReservationDetails(Long resId, Long partnerId) throws RentalRecordNotFoundException, EntityMismatchException;
+
+   
 }
