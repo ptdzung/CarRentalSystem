@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CustomerEntity;
+import entity.PartnerEntity;
 import entity.RentalRecordEntity;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,8 +30,7 @@ import util.exception.RentalRecordNotFoundException;
 @Local(ReservationRecordSessionBeanLocal.class)
 @Remote(ReservationRecordSessionBeanRemote.class)
 public class ReservationRecordSessionBean implements ReservationRecordSessionBeanRemote, ReservationRecordSessionBeanLocal {
-
-   
+  
     @EJB
     private CarSessionBeanLocal carSessionBean;
     
@@ -101,7 +101,7 @@ public class ReservationRecordSessionBean implements ReservationRecordSessionBea
     }
     
     @Override
-    public String retrieveReservationDetails(Long resId, Long customerId) throws RentalRecordNotFoundException, EntityMismatchException{
+    public String retrieveCustomerReservationDetails(Long resId, Long customerId) throws RentalRecordNotFoundException, EntityMismatchException{
         RentalRecordEntity res =  em.find(RentalRecordEntity.class, resId);
         if(res == null){
             throw new RentalRecordNotFoundException("Reservation Record not found");
@@ -109,6 +109,26 @@ public class ReservationRecordSessionBean implements ReservationRecordSessionBea
             throw new EntityMismatchException("Customer Id provided does not match Customer Id in reservation record");
         }else if(!res.getCustomer().getCustomerId().equals(customerId)){
             throw new EntityMismatchException("Customer Id provided does not match Customer Id in reservation record");
+        }else{
+            String details = "Reservation Id: " + res.getRentalRecordId() + "\n" +
+                             "Car: " + res.getCar() + "\n" +
+                             "Start Date: " + res.getRentedFrom() + "\n" +
+                             "End Date: " + res.getRentedTo() + "\n" +
+                             "Total Amount: $" + res.getTotalAmount() + "\n";
+            
+            return details;
+        }
+    }
+    
+    @Override
+    public String retrievePartnerReservationDetails(Long resId, Long partnerId) throws RentalRecordNotFoundException, EntityMismatchException{
+        RentalRecordEntity res =  em.find(RentalRecordEntity.class, partnerId);
+        if(res == null){
+            throw new RentalRecordNotFoundException("Reservation Record not found");
+        }else if(res.getPartner() == null){
+            throw new EntityMismatchException("Partner Id provided does not match Partner Id in reservation record");
+        }else if(!res.getPartner().getPartnerId().equals(partnerId)){
+            throw new EntityMismatchException("Partner Id provided does not match Partner Id in reservation record");
         }else{
             String details = "Reservation Id: " + res.getRentalRecordId() + "\n" +
                              "Car: " + res.getCar() + "\n" +
@@ -143,6 +163,14 @@ public class ReservationRecordSessionBean implements ReservationRecordSessionBea
     public List<RentalRecordEntity> retrieveRentalRecordsByCustomer(CustomerEntity cus) {
         Query query = em.createQuery("SELECT rr FROM RentalRecordEntity rr WHERE rr.customer = :inCustomer");
         query.setParameter("inCustomer", cus);
+        
+        return query.getResultList();
+    }
+    
+    @Override
+    public List<RentalRecordEntity> retrieveRentalRecordsByPartner(PartnerEntity part) {
+        Query query = em.createQuery("SELECT rr FROM RentalRecordEntity rr WHERE rr.partner = :inPartner");
+        query.setParameter("inPartner", part);
         
         return query.getResultList();
     }
