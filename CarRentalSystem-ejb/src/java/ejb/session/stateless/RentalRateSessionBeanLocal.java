@@ -5,35 +5,29 @@
  */
 package ejb.session.stateless;
 
-import entity.CustomerEntity;
-import entity.PartnerEntity;
-import entity.RentalRecordEntity;
-import util.exception.EntityMismatchException;
-import util.exception.RentalRecordNotFoundException;
-import java.util.Date;
+import entity.RentalRateEntity;
 import java.util.List;
+import util.exception.CarCategoryNotFoundException;
+import util.exception.InputDataValidationException;
+import util.exception.RentalRateNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
- * @author Trishpal
+ * @author Pham The Dzung
  */
-public interface ReservationRecordSessionBeanLocal {
+public interface RentalRateSessionBeanLocal {
+
+    Long createNewRentalRate(RentalRateEntity rentalRate) throws InputDataValidationException, UnknownPersistenceException;
+
+    RentalRateEntity retrieveRentalRate(String rateName, String categoryName) throws RentalRateNotFoundException, CarCategoryNotFoundException;
+
+    void updateRentalRate(RentalRateEntity rate) throws RentalRateNotFoundException, InputDataValidationException;
     
-    public String retrieveCustomerReservationDetails(Long resId, Long customerId) throws RentalRecordNotFoundException, EntityMismatchException;
-
-    public String cancelReservation(long resId) throws RentalRecordNotFoundException;
+    RentalRateEntity retrieveRentalRateById(Long rentalRateId) throws RentalRateNotFoundException;
     
-    public RentalRecordEntity retrieveReservationById(Long resId) throws RentalRecordNotFoundException;
+    boolean deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException;
 
-    public List<RentalRecordEntity> retrieveRentalRecordByDate(Date date);
-
-    List<RentalRecordEntity> retrieveRentalRecordsByCustomer(CustomerEntity cus);
+    List<RentalRateEntity> retrieveAllRentalRates();
     
-    public List<RentalRecordEntity> retrieveRentalRecordsByPartner(PartnerEntity part);
-
-    boolean carAllocation(Date date);
-
-    public String retrievePartnerReservationDetails(Long resId, Long partnerId) throws RentalRecordNotFoundException, EntityMismatchException;
-
-   
 }
