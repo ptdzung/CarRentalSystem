@@ -159,83 +159,55 @@ public class MainApp {
     }
     
     private void searchCar(){
+       try {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("*** Reservation System :: Search car ***\n");
+     
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        System.out.print("Enter rental pickup date:> ");
+        Date startDate = df.parse(sc.next());
+        System.out.print("Enter rental return date:> ");
+        Date endDate = df.parse(sc.next());
         
-      /*
-      Scanner sc = new Scanner(System.in);
-        
-      try {
-            System.out.println("\n****Search Car*****");
-            DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-            System.out.println("Enter  in date (dd/mm/yyyy):");
-            Date startDate = df.parse(sc.next());
-            System.out.println("Enter check out date (dd/mm/yyyy):");
-            Date endDate = df.parse(sc.next());
-            
-            if(startDate.after(endDate) || startDate.equals(endDate)){
-                System.err.println("\nCheck in date must be after checkout date.\n");
-                return null;
-            }
-            
-            ReservationTicket ticket = roomReservationController.searchRooms(startDate, endDate, false);
-            if(ticket.getAvailableRoomTypes().isEmpty()){
-                System.err.println("\nThere are no available rooms for your desired check in and check out date.\n");
-                return null;
-            }
-            System.out.println("\n***Available Rooms*");
-            for(int i = 0; i < ticket.getAvailableRoomTypes().size(); i++){
-                RoomTypeEntity type = ticket.getAvailableRoomTypes().get(i);
-                System.out.println("(" + i + ")" + type.getTypeName());
-                System.out.println(type.getDescription());
-                System.out.println("Amenities: " + type.getAmenities());
-                System.out.println("Capacity: " + type.getCapacity());
-                System.out.println("Rooms Available: " + ticket.getRespectiveNumberOfRoomsRemaining().get(i) );
-                System.out.println("Cost: " + ticket.getRespectiveTotalBill().get(i));
-                System.out.println();
-            }
-            System.out.println("\n****End of list****\n");
-            while(loggedIn){
-                System.out.println("Reserve a room? (Y/N)");
-                String resp = sc.next();
-                switch(resp){
-                    case "Y":
-                        reserveHotelRoom(ticket);
-                        return ticket;
-                    case "N":
-                        return null;
-                        
-                    default:
-                        System.out.println("Please choose a valid option");
-                        break;
-                }
-            }
-            return ticket;
-        } catch (ParseException ex) {
-            System.err.println("\nPlease enter valid date format\n");
-            return null;
+        if (startDate.after(endDate) || startDate.equals(endDate)) {
+            System.err.println("\nPick up date must be before return date.\n");
+            return;
         }
-        */
+        
+        System.out.print("Enter pickup outlet:> ");
+        String pickupOutlet = sc.nextLine().trim();
+        System.out.print("Enter return outlet:> ");
+        String returnOutlet = sc.nextLine().trim();
+        
+        //carSessionBeanRemote.searchCar(startDate,endDate, pickupOutlet, returnOutlet);
+        
+        System.out.println("\n***End of list***\n");
+        while (loggedIn) {
+            System.out.print("Reserve a car? (Y/N)> ");
+            String input = sc.next();
+            switch (input) {
+                case "Y":
+                    reserveCar();
+                    break;
+                case "N":
+                    return;             
+                default:
+                    System.out.println("Please choose a valid option");
+                    break;                     
+            }
+        }
+       }catch (ParseException ex) {
+          System.err.println("\nPlease enter valid date format\n");
+       }
+     
     }
     
     private void reserveCar(){
-        /*
+        
         Scanner sc = new Scanner(System.in);
         
-        for(int i = 0; i < ticket.getAvailableRoomTypes().size(); i++){
-            RoomTypeEntity type = ticket.getAvailableRoomTypes().get(i);
-            System.out.println("Enter number of " + type.getTypeName() + " to reserve:");
-            int num = sc.nextInt();
-            if(num < 0 || num > ticket.getRespectiveNumberOfRoomsRemaining().get(i)){
-                ticket.getRespectiveNumberReserved().add(0);
-                System.out.println("*Invalid Number, 0 rooms of this type will be reserved*\n");
-            }else{
-                ticket.getRespectiveNumberReserved().add(num);
-                System.out.println("*" + num + " of " + type.getTypeName() + " added to cart*\n");
-            }
-        }
+        System.out.println("*** Reservation System :: Reserve car ***\n");
         
-        roomReservationController.reserveRoom(ticket);
-        System.out.println("Reservation Successful.");
-    */
     }
     
     
