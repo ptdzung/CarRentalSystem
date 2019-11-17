@@ -19,8 +19,16 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import javax.persistence.PersistenceException;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.exception.EntityMismatchException;
+import util.exception.InputDataValidationException;
 import util.exception.RentalRecordNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -30,14 +38,20 @@ import util.exception.RentalRecordNotFoundException;
 @Local(ReservationRecordSessionBeanLocal.class)
 @Remote(ReservationRecordSessionBeanRemote.class)
 public class ReservationRecordSessionBean implements ReservationRecordSessionBeanRemote, ReservationRecordSessionBeanLocal {
-  
+
+   
     @EJB
     private CarSessionBeanLocal carSessionBean;
     
     @PersistenceContext(unitName = "CarRentalManagementSystem-ejbPU")
     private EntityManager em;
+    
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
 
     public ReservationRecordSessionBean() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
     
     @Override
@@ -101,7 +115,7 @@ public class ReservationRecordSessionBean implements ReservationRecordSessionBea
     }
     
     @Override
-    public String retrieveCustomerReservationDetails(Long resId, Long customerId) throws RentalRecordNotFoundException, EntityMismatchException{
+    public String retrieveReservationDetails(Long resId, Long customerId) throws RentalRecordNotFoundException, EntityMismatchException{
         RentalRecordEntity res =  em.find(RentalRecordEntity.class, resId);
         if(res == null){
             throw new RentalRecordNotFoundException("Reservation Record not found");
@@ -147,12 +161,8 @@ public class ReservationRecordSessionBean implements ReservationRecordSessionBea
         List<RentalRecordEntity> returnList = new ArrayList<>();
         for (RentalRecordEntity r : list) {
             Date temp = r.getRentedFrom();
-            if(date.getYear() == temp.getYear()) {
-                if(date.getMonth() == temp.getMonth()) {
-                    if(date.getDay() == temp.getDay()) {
-                        returnList.add(r);
-                    }
-                }
+            if(temp.getTime() - date.getTime() > 86400000) {
+                returnList.add(r);
             }
         }
         
@@ -167,17 +177,14 @@ public class ReservationRecordSessionBean implements ReservationRecordSessionBea
         return query.getResultList();
     }
     
-    @Override
-    public List<RentalRecordEntity> retrieveRentalRecordsByPartner(PartnerEntity part) {
-        Query query = em.createQuery("SELECT rr FROM RentalRecordEntity rr WHERE rr.partner = :inPartner");
-        query.setParameter("inPartner", part);
-        
-        return query.getResultList();
-    }
+    
 
     @Override
     public boolean carAllocation(Date date) {
-        List<RentalRecordEntity> rentalRecords = retrieveRentalRecordByDate(date);
+        Query query = em.createQuery("SELECT r FROM RentalRecordEntity r WHERE r.startDate BETWEEN :inStartDate AND :inEndDate");
+        query.setParameter("inStartDate", date);
+        query.setParameter("inEndDate", new Date(date.getTime() + 86399999));
+        List<RentalRecordEntity> rentalRecords = query.getResultList();
         if (rentalRecords.isEmpty()) {
             return false;
         }
@@ -187,7 +194,49 @@ public class ReservationRecordSessionBean implements ReservationRecordSessionBea
         }
         return true;
     }
-    
-    
 
+    @Override
+    public Long createNewRentalRecord(RentalRecordEntity record) throws InputDataValidationException, UnknownPersistenceException {
+        try
+        {
+            Set<ConstraintViolation<RentalRecordEntity>>constraintViolations = validator.validate(record);
+        
+            if(constraintViolations.isEmpty())
+            {
+                em.persist(record);
+                em.flush();
+
+                return record.getRentalRecordId();
+            }
+            else
+            {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsForRental(constraintViolations));
+            }            
+        }
+        catch(PersistenceException ex) {
+                throw new UnknownPersistenceException(ex.getMessage());
+        }
+    }
+    
+    private String prepareInputDataValidationErrorsForRental(Set<ConstraintViolation<RentalRecordEntity>>constraintViolations)
+    {
+        String msg = "Input data validation error!:";
+            
+        for(ConstraintViolation constraintViolation:constraintViolations)
+        {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+        
+        return msg;
+    }
+
+    @Override
+    public List<RentalRecordEntity> retrieveRentalRecordsByPartner(PartnerEntity part) {
+        Query query = em.createQuery("SELECT rr FROM RentalRecordEntity rr WHERE rr.partner = :inPartner");
+        query.setParameter("inPartner", part);
+        
+        return query.getResultList();
+    }
+
+    
 }

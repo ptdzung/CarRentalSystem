@@ -7,6 +7,8 @@ package ejb.session.stateless;
 
 import entity.CarCategoryEntity;
 import entity.RentalRateEntity;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
@@ -172,6 +174,37 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         Query query = em.createQuery("SELECT rr FROM RentalRateEntity rr");
         
         return query.getResultList();
+    }
+
+    @Override
+    public List<RentalRateEntity> retrieveRentalRatesForSearch(CarCategoryEntity category, Date startDate, Date endDate) {
+        Query query = em.createQuery("SELECT rr FROM RentalRateEntity rr WHERE rr.carCategory = :inCategory AND rr.status = :inStatus");
+        query.setParameter("inCategory", category);
+        query.setParameter("inStatus", StatusEnum.AVAILABLE);
+        List<RentalRateEntity> rates = query.getResultList();
+        
+        List<RentalRateEntity> availableRates = new ArrayList<>();
+        for (RentalRateEntity r : rates) {
+            if (r.getStartDate() == null && r.getEndDate() == null) {
+                availableRates.add(r);
+            } else if (r.getStartDate().getTime() <= startDate.getTime() || r.getEndDate().getTime() >= endDate.getTime()) {
+                availableRates.add(r);
+            }
+        }
+        
+        return availableRates;
+    }
+
+    @Override
+    public RentalRateEntity getOptimalRate(List<RentalRateEntity> rentalRates) {
+        RentalRateEntity optimal = rentalRates.get(0);
+        for (RentalRateEntity r : rentalRates) {
+            if (optimal.getRatePerDay().compareTo(r.getRatePerDay()) > 0) {
+                optimal = r;
+            }
+        }
+        
+        return optimal;
     }
     
     

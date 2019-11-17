@@ -9,8 +9,10 @@ import entity.CarCategoryEntity;
 import entity.CarEntity;
 import entity.CarModelEntity;
 import entity.OutletEntity;
+import entity.RentalRateEntity;
 import entity.RentalRecordEntity;
 import entity.TravelDispatchRecordEntity;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +36,7 @@ import util.exception.CarNotFoundException;
 import util.exception.CarModelNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.LicensePlateExistException;
+import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -46,7 +49,12 @@ import util.exception.UnknownPersistenceException;
 public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal {
 
     @EJB
+    private RentalRateSessionBeanLocal rentalRateSessionBeanLocal;
+
+    @EJB
     private DispatchSessionBeanLocal dispatchSessionBeanLocal;
+    
+    
 
     @PersistenceContext(unitName = "CarRentalManagementSystem-ejbPU")
     private EntityManager em;
@@ -335,26 +343,6 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             throw new InputDataValidationException("License plate input is invalid!");
         }
     }
-    
-    public List<CarCategoryEntity> searchCar(Date startDate,Date endDate, String pickupOutlet, String returnOutlet) {
-        Query query1 = em.createQuery("SELECT o FROM OutletEntity o WHERE o.openTime = :inOpenTime AND o.name = :inName");
-        query1.setParameter("inOpenTime", startDate);
-        query1.setParameter("inName", pickupOutlet);
-        OutletEntity outlet1 = (OutletEntity)query1.getSingleResult();
-        
-        Query query2 = em.createQuery("SELECT o FROM OutletEntity o WHERE o.openTime = :inOpenTime AND o.name = :inName");
-        query2.setParameter("inOpenTime", endDate);
-        query2.setParameter("inName", returnOutlet);
-        OutletEntity outlet2 = (OutletEntity)query2.getSingleResult();
-        
-        List<CarEntity> allCars = outlet1.getCars();
-        
-        for(CarEntity car: allCars){
-            
-        }
-        
-        return null;
-    }
 
     @Override
     public CarEntity retrieveCarForAllocation(RentalRecordEntity record) {
@@ -376,7 +364,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         //Car is currently rented, but will be return to outlet before pickup time
         for (CarEntity c : cars) {
             if (c.getStatus().equals(StatusEnum.RENTED) && c.getRentalRecord().getReturnOutlet().equals(pickupOutlet)) {
-                if (c.getRentedTo().compareTo(pickupDate) <= 0) return c;
+                if (pickupDate.getTime() - c.getRentedTo().getTime() >= 0) return c;
             }
         }
         //Car is currently at another outlet -> need transit
@@ -393,7 +381,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         //Car is currently rented and going to be returned to another outlet -> need transit
         for (CarEntity c : cars) {
             if (c.getStatus().equals(StatusEnum.RENTED)) {
-                if (c.getRentedTo().compareTo(pickupDate) <= 7200) {
+                if (pickupDate.getTime() - c.getRentedTo().getTime() >= 7200000) {
                     try {
                         dispatchSessionBeanLocal.createNewTravelDispatchRecord(new TravelDispatchRecordEntity(pickupOutlet, record));
                     } catch (InputDataValidationException | UnknownPersistenceException ex) {
@@ -405,6 +393,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
         
         return null;
+        
         
 //        if (record.getCarModel() == null) {
 //            List<CarModelEntity> models = category.getCarModels();
@@ -425,6 +414,55 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 //                }
 //            }
 //        }
+    }
+
+    @Override
+    public List<CarEntity> searchCar(CarCategoryEntity category, CarModelEntity model, Date startDate, Date endDate, OutletEntity pickupOutlet) {
+        List<CarEntity> returnList = new ArrayList<>();
+        
+        if (model == null) {
+            Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.carModel.carCategory = :inCategory");
+            query.setParameter("inCategory", category);
+            List<CarEntity> cars = query.getResultList();
+            
+            for (CarEntity c : cars) {
+                if (c.getStatus().equals(StatusEnum.AVAILABLE) && c.getOutlet().equals(pickupOutlet)) {
+                    returnList.add(c);
+                } else if (c.getStatus().equals(StatusEnum.RENTED) && c.getRentalRecord().getReturnOutlet().equals(pickupOutlet)) {
+                    if (startDate.getTime() - c.getRentedTo().getTime() >= 0l) {
+                        returnList.add(c);
+                    }
+                } else if (c.getStatus().equals(StatusEnum.AVAILABLE) && !c.getOutlet().equals(pickupOutlet)) {
+                    returnList.add(c);
+                } else if (c.getStatus().equals(StatusEnum.RENTED)) {
+                    if (startDate.getTime() - c.getRentedTo().getTime() >= 7200000l) {
+                        returnList.add(c);
+                    }
+                }
+            }
+            return returnList;
+        } else {
+            Query query = em.createQuery("SELECT c FROM CarEntity c WHERE c.carModel = :inModel");
+            query.setParameter("inModel", model);
+            List<CarEntity> cars = query.getResultList();
+            
+            for (CarEntity c : cars) {
+                if (c.getStatus().equals(StatusEnum.AVAILABLE) && c.getOutlet().equals(pickupOutlet)) {
+                    returnList.add(c);
+                } else if (c.getStatus().equals(StatusEnum.RENTED) && c.getRentalRecord().getReturnOutlet().equals(pickupOutlet)) {
+                    if (startDate.getTime() - c.getRentedTo().getTime() >= 0l) {
+                        returnList.add(c);
+                    }
+                } else if (c.getStatus().equals(StatusEnum.AVAILABLE) && !c.getOutlet().equals(pickupOutlet)) {
+                    returnList.add(c);
+                } else if (c.getStatus().equals(StatusEnum.RENTED)) {
+                    if (startDate.getTime() - c.getRentedTo().getTime() >= 7200000l) {
+                        returnList.add(c);
+                    }
+                }
+            }
+            return returnList;
+        }
     }
     
     

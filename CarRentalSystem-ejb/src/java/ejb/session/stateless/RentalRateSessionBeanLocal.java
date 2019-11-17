@@ -5,7 +5,10 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategoryEntity;
 import entity.RentalRateEntity;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import util.exception.CarCategoryNotFoundException;
 import util.exception.InputDataValidationException;
@@ -29,5 +32,9 @@ public interface RentalRateSessionBeanLocal {
     boolean deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException;
 
     List<RentalRateEntity> retrieveAllRentalRates();
+
+    List<RentalRateEntity> retrieveRentalRatesForSearch(CarCategoryEntity category, Date startDate, Date endDate);
+
+    RentalRateEntity getOptimalRate(List<RentalRateEntity> rentalRates);
     
 }

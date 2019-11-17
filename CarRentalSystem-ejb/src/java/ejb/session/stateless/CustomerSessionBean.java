@@ -84,7 +84,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
                 {
                     if(ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException"))
                     {
-                        throw new UsernameExistException();
+                        throw new UsernameExistException(ex.getMessage());
                     }
                     else
                     {
